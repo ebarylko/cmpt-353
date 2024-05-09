@@ -1,5 +1,6 @@
 import numpy as np
 import toolz as tz
+import operator as op
 
 data = np.load('e1/monthdata.npz')
 totals = data['totals']
@@ -22,8 +23,11 @@ def row_of_city_with_lowest_precipitation(cities):
 
 
 def average_monthly_precipitation(precipitation, observations):
-    return tz.thread_last(
-        np.sum(precipitation, 0),
+    return tz.thread_first(
+        precipitation,
+        (np.sum, 0),
+        (np.vectorize(op.truediv),
+         np.sum(observations, 0))
     )
 
 

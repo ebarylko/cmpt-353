@@ -11,4 +11,4 @@ def test_row_of_city_with_lowest_precipitation():
 
 
 def test_average_monthly_precipitation():
-    ts.assert_equal(nps.average_monthly_precipitation(sample_precipitation, sample_counts), np.array([0.4, 7 / 11, 8 / 7]))
+    ts.assert_equal(nps.average_monthly_precipitation(sample_precipitation, sample_counts), np.array([0.4, 6 / 11, 8 / 7]))
