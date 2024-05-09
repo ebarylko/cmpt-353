@@ -1,6 +1,7 @@
 import numpy as np
 import toolz as tz
 import operator as op
+import functools as ft
 
 data = np.load('e1/monthdata.npz')
 totals = data['totals']
@@ -53,3 +54,13 @@ print(row_of_city_with_lowest_precipitation(totals))
 print(average_monthly_precipitation(totals, counts))
 print(average_precipitation_in_cites(totals, counts))
 
+
+def precipitation_quarters_for_each_city(precipitations):
+    return tz.thread_last(
+        precipitations,
+        (map, tz.curry(tz.partition, 3)),
+        (map, lambda coll: map(
+            tz.curry(ft.reduce, op.add), coll)),
+        (map, list),
+        list
+    )

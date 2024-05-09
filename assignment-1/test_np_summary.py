@@ -1,9 +1,11 @@
 import numpy as np
 import numpy.testing as ts
 import np_summary as nps
+import itertools as it
 
 sample_precipitation = np.array([[1, 2, 3], [3, 4, 5]])
 sample_counts = np.array([[6, 9, 2], [4, 2, 5]])
+larger_sample = np.array([list(range(12)), list(it.repeat(1, 12))])
 
 
 def test_row_of_city_with_lowest_precipitation():
@@ -11,8 +13,14 @@ def test_row_of_city_with_lowest_precipitation():
 
 
 def test_average_monthly_precipitation():
-    ts.assert_equal(nps.average_monthly_precipitation(sample_precipitation, sample_counts), np.array([0.4, 6 / 11, 8 / 7]))
+    ts.assert_equal(nps.average_monthly_precipitation(sample_precipitation, sample_counts),
+                    np.array([0.4, 6 / 11, 8 / 7]))
 
 
 def test_average_precipitation_in_cites():
-    ts.assert_equal(nps.average_precipitation_in_cites(sample_precipitation, sample_counts), np.array([6 / 17, 12 / 11]))
+    ts.assert_equal(nps.average_precipitation_in_cites(sample_precipitation, sample_counts),
+                    np.array([6 / 17, 12 / 11]))
+
+
+def test_precipitation_quarters_for_each_city():
+    ts.assert_equal(nps.precipitation_quarters_for_each_city(larger_sample), np.array([[3, 12, 21, 30], [3, 3, 3, 3]]))
