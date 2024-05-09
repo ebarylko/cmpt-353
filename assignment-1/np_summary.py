@@ -45,7 +45,8 @@ def average_precipitation_in_cites(cities, observations):
         cities,
         (map, np.sum),
         (zip, np.sum(observations, 1)),
-        (map, lambda pair: pair[1] / pair[0]),
+        (map, reversed),
+        (map, lambda pair: op.truediv(*pair)),
         list,
     )
 
