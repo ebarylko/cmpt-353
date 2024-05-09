@@ -31,24 +31,25 @@ def average_monthly_precipitation(precipitation, observations):
     )
 
 
-def test_average_precipitation_in_cites(cities):
+def average_precipitation_in_cites(cities, observations):
     """
     Args:
         cities: a series of collections containing the monthly precipitations across a full year for multiple cities
+        observations: a series of collections with the number of observations per-month for each city
 
     Returns: returns a collection of the average precipitations for each city
 
     """
-    return tz.thread_first(
+    return tz.thread_last(
         cities,
-        (np.sum, 1),
+        (map, np.sum),
+        (zip, np.sum(observations, 1)),
+        (map, lambda pair: pair[1] / pair[0]),
         list,
-        (np.divide, 12)
     )
 
 
 print(row_of_city_with_lowest_precipitation(totals))
 print(average_monthly_precipitation(totals, counts))
-# print(counts)
-# print(totals)
+print(average_precipitation_in_cites(totals, counts))
 
