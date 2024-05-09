@@ -50,11 +50,6 @@ def average_precipitation_in_cites(cities, observations):
     )
 
 
-print(row_of_city_with_lowest_precipitation(totals))
-print(average_monthly_precipitation(totals, counts))
-print(average_precipitation_in_cites(totals, counts))
-
-
 def precipitation_quarters_for_each_city(precipitations):
     return tz.thread_last(
         precipitations,
@@ -64,3 +59,10 @@ def precipitation_quarters_for_each_city(precipitations):
         (map, list),
         list
     )
+
+
+print(row_of_city_with_lowest_precipitation(totals))
+print(average_monthly_precipitation(totals, counts))
+print(average_precipitation_in_cites(totals, counts))
+print(precipitation_quarters_for_each_city(totals))
+
