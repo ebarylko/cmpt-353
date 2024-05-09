@@ -6,7 +6,7 @@ totals = data['totals']
 counts = data['counts']
 
 
-def city_with_lowest_precipitation(cities):
+def row_of_city_with_lowest_precipitation(cities):
     """
     Args:
         cities: a collection of the monthly precipitation for various cities
@@ -16,5 +16,18 @@ def city_with_lowest_precipitation(cities):
     return tz.thread_last(
         cities,
         (map, np.sum),
-        list
+        list,
+        np.argmin,
     )
+
+
+def average_monthly_precipitation(precipitation, observations):
+    return tz.thread_last(
+        np.sum(precipitation, 0),
+    )
+
+
+print(row_of_city_with_lowest_precipitation(totals))
+print(counts)
+print(totals)
+

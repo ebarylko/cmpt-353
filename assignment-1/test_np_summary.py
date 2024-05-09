@@ -1,8 +1,14 @@
 import numpy as np
+import numpy.testing as ts
 import np_summary as nps
 
-sample = np.array([[1, 2, 3], [3, 4, 5]])
+sample_precipitation = np.array([[1, 2, 3], [3, 4, 5]])
+sample_counts = np.array([[6, 9, 2], [4, 2, 5]])
 
 
-def test_city_with_lowest_precipitation():
-    assert nps.city_with_lowest_precipitation(sample) == 0
+def test_row_of_city_with_lowest_precipitation():
+    assert nps.row_of_city_with_lowest_precipitation(sample_precipitation) == 0
+
+
+def test_average_monthly_precipitation():
+    ts.assert_equal(nps.average_monthly_precipitation(sample_precipitation, sample_counts), np.array([0.4, 7 / 11, 8 / 7]))
