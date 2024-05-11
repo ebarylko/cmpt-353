@@ -4,8 +4,6 @@ import functools as ft
 import toolz as tz
 import operator as op
 
-totals = pd.read_csv('e1/totals.csv').set_index(keys=['name'])
-
 
 def thread_last(val, *forms):
     def evalform_back(val, form):
@@ -17,6 +15,19 @@ def thread_last(val, *forms):
             return func(*args)
 
     return ft.reduce(evalform_back, forms, val)
+
+
+
+totals = pd.read_csv('e1/totals.csv').set_index(keys=['name'])
+
+get_observations = op.methodcaller("get", "counts")
+
+all_observations = tz.thread_first(
+    'e1/monthdata.npz',
+    np.load,
+    get_observations,
+    lambda observations: pd.DataFrame(observations, columns=totals.columns)  # Mejorar esta linea
+ )
 
 
 def city_with_lowest_precipitation(cities):
@@ -39,18 +50,10 @@ def average_monthly_precipitation(cities, observations):
 
     Returns: the average precipitation in all months of the year
     """
-    monthly_observations = observations.apply(np.sum, axis=0)
-
-    # print(type(monthly_observations))
-    # print(observations.apply(np.sum, axis=0).index)
-    # print(observations.apply(np.sum, axis=0))
-    # print(cities.apply(np.sum, axis=0))
-    # print(np.divide(cities.apply(np.sum, axis=0), observations.apply(np.sum, axis=0)))
-    # print(np.divide(monthly_observations, pd.DataFrame(np.array([1, 2, 3]), index=["Jan", "Feb", "Mar"])))
-    return tz.thread_first(
-        cities.apply(np.sum, axis=0),
-        (np.divide, observations.apply(np.sum, axis=0))
-    )
+    # return observations.apply(np.sum, axis=0)
+    return (cities.pipe(op.methodcaller("apply", np.sum, axis=0))
+            .pipe(np.divide, observations.apply(np.sum, axis=0)))
 
 
 print(city_with_lowest_precipitation(totals))
+print(average_monthly_precipitation(totals, all_observations))
