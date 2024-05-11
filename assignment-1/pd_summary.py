@@ -39,8 +39,17 @@ def average_monthly_precipitation(cities, observations):
 
     Returns: the average precipitation in all months of the year
     """
-    return thread_last(
+    monthly_observations = observations.apply(np.sum, axis=0)
+
+    # print(type(monthly_observations))
+    # print(observations.apply(np.sum, axis=0).index)
+    # print(observations.apply(np.sum, axis=0))
+    # print(cities.apply(np.sum, axis=0))
+    # print(np.divide(cities.apply(np.sum, axis=0), observations.apply(np.sum, axis=0)))
+    # print(np.divide(monthly_observations, pd.DataFrame(np.array([1, 2, 3]), index=["Jan", "Feb", "Mar"])))
+    return tz.thread_first(
         cities.apply(np.sum, axis=0),
+        (np.divide, observations.apply(np.sum, axis=0))
     )
 
 
