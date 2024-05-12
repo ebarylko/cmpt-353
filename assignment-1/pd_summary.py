@@ -35,5 +35,21 @@ def average_monthly_precipitation(cities, observations):
     return cities.pipe(sum_rows).pipe(np.divide, sum_rows(observations))
 
 
+def average_annual_precipitations(cities, observations):
+    """
+    Args:
+        cities: a series of collections where each one contains the monthly precipitations for a city
+        observations: a series of collections where each one contains the number of observations per month for a city
+
+    Returns: the yearly annual precipitations in all the cities
+
+    """
+    def sum_columns(columns):
+        return columns.apply(np.sum, 'columns')
+
+    return sum_columns(cities) / sum_columns(observations)
+
+
 print(city_with_lowest_precipitation(totals))
 print(average_monthly_precipitation(totals, all_observations))
+

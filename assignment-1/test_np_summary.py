@@ -34,7 +34,17 @@ def test_average_precipitation_in_cites():
 
 
 larger_sample = np.array([list(range(12)), list(it.repeat(1, 12))])
+expected_quarters = np.array([[5450, 1408, 1466, 4624],
+                              [189, 1339, 3148, 527],
+                              [3120, 3357, 3386, 4705],
+                              [4416, 3321, 2024, 5325],
+                              [2024, 1498, 1721, 3208],
+                              [1786, 1809, 2557, 2397],
+                              [1583, 1296, 1729, 1770],
+                              [4602, 1340, 1250, 5956],
+                              [338, 524, 922, 450]])
 
 
 def test_precipitation_quarters_for_each_city():
     ts.assert_equal(nps.precipitation_quarters_for_each_city(larger_sample), np.array([[3, 12, 21, 30], [3, 3, 3, 3]]))
+    ts.assert_allclose(nps.precipitation_quarters_for_each_city(totals), expected_quarters)

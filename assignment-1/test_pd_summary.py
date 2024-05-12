@@ -4,7 +4,7 @@ import pandas.testing as pdt
 import numpy as np
 
 sample_cities = pd.DataFrame(np.array([[1, 2, 3], [3, 4, 5]]), index=["a", "b"], columns=["Jan", "Feb", "Mar"])
-sample_observations = pd.DataFrame([[1, 1, 1], [2, 3, 4]], columns=["Jan", "Feb", "Mar"])
+sample_observations = pd.DataFrame([[1, 1, 1], [2, 3, 4]], columns=["Jan", "Feb", "Mar"], index=["a", "b"])
 totals = pd.read_csv('e1/totals.csv').set_index(keys=['name'])
 
 
@@ -24,3 +24,8 @@ def test_average_monthly_precipitation():
     pdt.assert_series_equal(pds.average_monthly_precipitation(sample_cities, sample_observations),
                             expected_small_sample_averages)
     pdt.assert_series_equal(pds.average_monthly_precipitation(totals, all_observations), expected_large_sample_averages)
+
+
+def test_average_annual_precipitations():
+    pdt.assert_series_equal(pds.average_annual_precipitations(sample_cities, sample_observations),
+                            pd.Series(np.array([2, 4 / 3]), index=["a", "b"]))
