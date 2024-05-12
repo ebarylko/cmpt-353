@@ -52,4 +52,4 @@ def average_annual_precipitations(cities, observations):
 
 print(city_with_lowest_precipitation(totals))
 print(average_monthly_precipitation(totals, all_observations))
-
+print(average_annual_precipitations(totals, all_observations))

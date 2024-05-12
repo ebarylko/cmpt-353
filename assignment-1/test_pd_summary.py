@@ -26,6 +26,35 @@ def test_average_monthly_precipitation():
     pdt.assert_series_equal(pds.average_monthly_precipitation(totals, all_observations), expected_large_sample_averages)
 
 
+yearly_averages = [47.778598,
+                   14.333333,
+                   39.912329,
+                   41.445055,
+                   23.409972,
+                   23.681440,
+                   17.521978,
+                   36.522222,
+                   6.154270]
+
+cities = ["BURNABY SIMON FRASER U",
+          "CALGARY INTL A",
+          "GANDER INTL A",
+          "HALIFAX INTL A",
+          "REVELSTOKE",
+          "SHERBROOKE",
+          "TORONTO LESTER B. PEARSON INT'",
+          "VANCOUVER INTL A",
+          "YELLOWKNIFE A"]
+
+# expected_average_precipitations = pd.Series(yearly_averages, index=cities)
+# print(expected_average_precipitations)
+# wx = pd.DataFrame(expected_average_precipitations)
+# wx = pd.DataFrame(expected_average_precipitations, columns=["name"]).set_index("name")
+
+# print(wx)
+
 def test_average_annual_precipitations():
     pdt.assert_series_equal(pds.average_annual_precipitations(sample_cities, sample_observations),
                             pd.Series(np.array([2, 4 / 3]), index=["a", "b"]))
+    # pdt.assert_series_equal(pds.average_annual_precipitations(totals, all_observations),
+    #                         expected_average_precipitations)
