@@ -17,17 +17,15 @@ def thread_last(val, *forms):
     return ft.reduce(evalform_back, forms, val)
 
 
-
 totals = pd.read_csv('e1/totals.csv').set_index(keys=['name'])
 
-get_observations = op.methodcaller("get", "counts")
+set_rows = op.methodcaller("set_index", keys=['name'])
 
 all_observations = tz.thread_first(
-    'e1/monthdata.npz',
-    np.load,
-    get_observations,
-    lambda observations: pd.DataFrame(observations, columns=totals.columns)  # Mejorar esta linea
- )
+    'e1/counts.csv',
+    pd.read_csv,
+    set_rows
+)
 
 
 def city_with_lowest_precipitation(cities):
@@ -50,7 +48,6 @@ def average_monthly_precipitation(cities, observations):
 
     Returns: the average precipitation in all months of the year
     """
-    # return observations.apply(np.sum, axis=0)
     return (cities.pipe(op.methodcaller("apply", np.sum, axis=0))
             .pipe(np.divide, observations.apply(np.sum, axis=0)))
 
