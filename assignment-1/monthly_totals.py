@@ -11,4 +11,14 @@ def date_to_month(d):
     return '%04i-%02i' % (d.year, d.month)
 
 
-print(get_precip_data()["date"][0].month)
+def pivot_months_pandas(data):
+    """
+    Pre: takes a series of collections, where each one represents an observation
+    taken at a specific city containing information about the precipitation and
+     elevation on the day the observation occurred
+     Post: returns two datasets, one detailing the monthly number of observations per city  and
+     the other describing the monthly precipitation per city
+    """
+
+
+print(get_precip_data()["date"])
