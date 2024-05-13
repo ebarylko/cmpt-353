@@ -46,15 +46,11 @@ cities = ["BURNABY SIMON FRASER U",
           "VANCOUVER INTL A",
           "YELLOWKNIFE A"]
 
-# expected_average_precipitations = pd.Series(yearly_averages, index=cities)
-# print(expected_average_precipitations)
-# wx = pd.DataFrame(expected_average_precipitations)
-# wx = pd.DataFrame(expected_average_precipitations, columns=["name"]).set_index("name")
+expected_average_precipitations = pd.Series(yearly_averages, index=cities, name="name")
 
-# print(wx)
 
 def test_average_annual_precipitations():
     pdt.assert_series_equal(pds.average_annual_precipitations(sample_cities, sample_observations),
                             pd.Series(np.array([2, 4 / 3]), index=["a", "b"]))
-    # pdt.assert_series_equal(pds.average_annual_precipitations(totals, all_observations),
-    #                         expected_average_precipitations)
+    pdt.assert_series_equal(pds.average_annual_precipitations(totals, all_observations),
+                            expected_average_precipitations, check_names=False)

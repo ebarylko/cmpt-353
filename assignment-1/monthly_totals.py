@@ -19,6 +19,4 @@ def pivot_months_pandas(data):
      Post: returns two datasets, one detailing the monthly number of observations per city  and
      the other describing the monthly precipitation per city
     """
-
-
-print(get_precip_data()["date"])
+    return tuple(data.groupby("name"))

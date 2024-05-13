@@ -24,5 +24,5 @@ expected_observations = pd.DataFrame({"name": ["a", "b"], "2019-04": [1, 1], "20
 
 
 def test_pivot_months_pandas():
-    assert pt.assert_frame_equal(tz.first(mt.pivot_months_pandas(sample_data)),
+    assert pt.assert_frame_equal(tz.first(mt.pivot_months_pandas(sample)),
                                  expected_observations)
