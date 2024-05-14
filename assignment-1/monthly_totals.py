@@ -19,6 +19,16 @@ def pivot_months_pandas(data):
      Post: returns two datasets, one detailing the monthly number of observations per city  and
      the other describing the monthly precipitation per city
     """
-    minimized_data = data.drop(columns=['elevation', 'station', 'latitude', 'longitude'])
-    minimized_data["months"] = minimized_data["date"].map(date_to_month)
-    return minimized_data.groupby(["name"])
+    def keep_date_name_and_precipitation(info):
+        info["date"] = info["date"].map(date_to_month)
+        return info.drop(columns=['elevation', 'station', 'latitude', 'longitude'])
+
+    def group_by_name_and_date(info):
+        return info.groupby(["name", "date"])
+
+    def number_of_observations(observations):
+        return len(list(observations))
+
+    return (data.pipe(keep_date_name_and_precipitation)
+            .pipe(group_by_name_and_date)
+            .agg({"precipitation": number_of_observations}))
