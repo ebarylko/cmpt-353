@@ -2,7 +2,7 @@ import numpy as np
 import operator as op
 import functools as ft
 
-data = np.load('e1/monthdata.npz')
+data = np.load('monthdata.npz')
 totals = data['totals']
 counts = data['counts']
 

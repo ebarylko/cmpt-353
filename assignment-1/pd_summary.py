@@ -4,9 +4,9 @@ import functools as ft
 import operator as op
 
 
-totals = pd.read_csv('e1/totals.csv').set_index(keys=['name'])
+totals = pd.read_csv('totals.csv').set_index(keys=['name'])
 
-all_observations = pd.read_csv('e1/counts.csv').set_index(keys=["name"])
+all_observations = pd.read_csv('counts.csv').set_index(keys=["name"])
 
 
 def city_with_lowest_precipitation(cities):

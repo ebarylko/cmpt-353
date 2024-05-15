@@ -4,7 +4,7 @@ import itertools as it
 
 
 def get_precip_data():
-    return pd.read_csv('e1/precipitation.csv', parse_dates=[2])
+    return pd.read_csv('precipitation.csv', parse_dates=[2])
 
 
 def date_to_month(d):
@@ -41,12 +41,6 @@ def pivot_months_pandas(data):
     precipitation_by_month = update_each_month_with(name_date_precip, "sum")
 
     return precipitation_by_month, observations_by_month
-
-
-totals, counts = pivot_months_pandas(get_precip_data())
-totals.to_csv('totals.csv')
-counts.to_csv('counts.csv')
-np.savez('monthdata.npz', totals=totals.values, counts=counts.values)
 
 
 def pivot_months_loops(data):
@@ -102,3 +96,17 @@ def pivot_months_loops(data):
     counts.columns.name = 'month'
 
     return totals, counts
+
+
+def main():
+    data = get_precip_data()
+    totals, counts = pivot_months_pandas(data)
+    totals.to_csv('totals.csv')
+    counts.to_csv('counts.csv')
+    np.savez('monthdata.npz', totals=totals.values, counts=counts.values)
+
+
+if __name__ == '__main__':
+    main()
+
+
