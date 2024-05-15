@@ -23,8 +23,9 @@ def pivot_months_pandas(data):
     """
 
     def keep_date_name_and_precipitation(info):
-        info["date"] = info["date"].map(date_to_month)
-        return info.drop(columns=['elevation', 'station', 'latitude', 'longitude'])
+        copy = info.filter(['date', 'precipitation', 'name'], axis=1)
+        copy["date"] = copy["date"].map(date_to_month)
+        return copy
 
     def group_by_name_and_date(info):
         return info.groupby(["name", "date"], as_index=False)
@@ -32,12 +33,12 @@ def pivot_months_pandas(data):
     def number_of_observations(observations):
         return len(list(observations))
 
-    def apply_f_on_precipitation_info(precipitation_info, f):
-        return precipitation_info.agg({"precipitation": f}).pivot(index="name", columns="date", values="precipitation")
+    def update_each_month_with(table, f):
+        return table.agg({"precipitation": f}).pivot(index="name", columns="date", values="precipitation")
 
-    cleaned_data = data.pipe(keep_date_name_and_precipitation).pipe(group_by_name_and_date)
-    observations_by_month = apply_f_on_precipitation_info(cleaned_data, number_of_observations)
-    precipitation_by_month = apply_f_on_precipitation_info(cleaned_data, "sum")
+    name_date_precip = data.pipe(keep_date_name_and_precipitation).pipe(group_by_name_and_date)
+    observations_by_month = update_each_month_with(name_date_precip, number_of_observations)
+    precipitation_by_month = update_each_month_with(name_date_precip, "sum")
 
     return precipitation_by_month, observations_by_month
 

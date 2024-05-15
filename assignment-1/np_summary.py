@@ -1,5 +1,4 @@
 import numpy as np
-import toolz as tz
 import operator as op
 import functools as ft
 
