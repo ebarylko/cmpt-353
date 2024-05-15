@@ -30,7 +30,7 @@ def pivot_months_pandas(data):
         return info.groupby(["name", "date"], as_index=False)
 
     def number_of_observations(observations):
-        return len(list(it.compress(observations, observations)))
+        return len(list(observations))
 
     def apply_f_on_precipitation_info(precipitation_info, f):
         return precipitation_info.agg({"precipitation": f}).pivot(index="name", columns="date", values="precipitation")
@@ -40,3 +40,10 @@ def pivot_months_pandas(data):
     precipitation_by_month = apply_f_on_precipitation_info(cleaned_data, "sum")
 
     return precipitation_by_month, observations_by_month
+
+
+totals, counts = pivot_months_pandas(get_precip_data())
+totals.to_csv('totals.csv')
+counts.to_csv('counts.csv')
+np.savez('monthdata.npz', totals=totals.values, counts=counts.values)
+
