@@ -25,7 +25,7 @@ sample_data = {"station": ["s1", "s2", "s1", "s2", "s1", "s2"],
 
 sample = pd.DataFrame(data=sample_data)
 
-expected_observations = pd.DataFrame({"name": ["a", "b"], "2019-04": [2, 1], "2019-05": [1, 1]}).set_index("name")
+expected_observations = pd.DataFrame({"name": ["a", "b"], "2019-04": [2, 1], "2019-05": [1, 2]}).set_index("name")
 
 expected_precipitation = pd.DataFrame({"name": ["a", "b"], "2019-04": [8, 3], "2019-05": [1, 4]}).set_index("name")
 
