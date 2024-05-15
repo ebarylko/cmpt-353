@@ -11,12 +11,18 @@ def test_date_to_month():
 
 sample_data = {"station": ["s1", "s2", "s1", "s2", "s1", "s2"],
                "name": ["a", "b", "a", "b", "a", "b"],
-               "date": [pd.Timestamp(2019, 4, 5),
-                        pd.Timestamp(2019, 4, 9),
-                        pd.Timestamp(2019, 5, 5),
-                        pd.Timestamp(2019, 5, 9),
-                        pd.Timestamp(2019, 4, 19),
-                        pd.Timestamp(2019, 5, 19)],
+               "date": ["2019-04-05",
+                        "2019-04-09",
+                        "2019-05-05",
+                        "2019-05-09",
+                        "2019-04-19",
+                        "2019-05-19"],
+               # "date": [pd.Timestamp(year=2019, month=4, day=5),
+               #          pd.Timestamp(year=2019, month=4, day=9),
+               #          pd.Timestamp(year=2019, month=5, day=5),
+               #          pd.Timestamp(year=2019, month=5, day=9),
+               #          pd.Timestamp(year=2019, month=4, day=19),
+               #          pd.Timestamp(year=2019, month=5, day=19)],
                "elevation": [0, 0, 0, 0, 0, 0],
                "latitude": [0, 0, 0, 0, 0, 0],
                "longitude": [0, 0, 0, 0, 0, 0],
@@ -24,16 +30,14 @@ sample_data = {"station": ["s1", "s2", "s1", "s2", "s1", "s2"],
 
 sample = pd.DataFrame(data=sample_data)
 
+expected_observations = pd.DataFrame({"name": ["a", "b"], "2019-04": [2, 1], "2019-05": [1, 1]}).set_index("name")
 
-expected_observations = pd.DataFrame({"name": ["a", "b"], "2019-04": [2, 1], "2019-05": [1, 1]})
+expected_precipitation = pd.DataFrame({"name": ["a", "b"], "2019-04": [8, 3], "2019-05": [1, 4]}).set_index("name")
 
+actual_precipitation, actual_observations = mt.pivot_months_pandas(sample)
 
-# print(tz.first(mt.pivot_months_pandas(sample)))
-# b = sample.set_index('name')
-t = mt.pivot_months_pandas(sample)
-print(t.apply(print))
-# print(t)
 
 def test_pivot_months_pandas():
-    assert pt.assert_frame_equal(tz.first(mt.pivot_months_pandas(sample)),
-                                 expected_observations)
+    pt.assert_frame_equal(actual_observations, expected_observations, check_names=False)
+    pt.assert_frame_equal(actual_precipitation, expected_precipitation, check_names=False)
+

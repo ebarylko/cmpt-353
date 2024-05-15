@@ -9,7 +9,8 @@ def get_precip_data():
 
 def date_to_month(d):
     # You may need to modify this function, depending on your data types.
-    return '%04i-%02i' % (d.year, d.month)
+    time_info = pd.Timestamp(d)
+    return '%04i-%02i' % (time_info.year, time_info.month)
 
 
 def pivot_months_pandas(data):
