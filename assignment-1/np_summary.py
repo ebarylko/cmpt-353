@@ -15,9 +15,9 @@ def row_of_city_with_lowest_precipitation(cities):
 
     Returns: the index of the row corresponding to the city with the lowest yearly precipitation
     """
-    return np.argmin(
-        map(np.sum, cities)
-    )
+    return np.argmin(list
+                     (map
+                      (np.sum, cities)))
 
 
 def average_monthly_precipitation(precipitation, observations):

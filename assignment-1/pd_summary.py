@@ -29,22 +29,22 @@ def average_monthly_precipitation(cities, observations):
 
     Returns: the average precipitation in all months of the year
     """
-    def sum_rows(rows):
-        return rows.apply(np.sum, 0)
+    def sum_columns(columns):
+        return columns.apply(np.sum, "index")
 
-    return cities.pipe(sum_rows).pipe(np.divide, sum_rows(observations))
+    return cities.pipe(sum_columns).pipe(np.divide, sum_columns(observations))
 
 
 def average_annual_precipitations(cities, observations) -> pd.Series:
     """
     Args:
         cities: a series of collections where each one contains the monthly precipitations for a city
-        observations: a series of collections where each one contains the number of observations per month for a city
+        observations: a series of collections where each one contains the number of monthly observations per city
 
     Returns: the yearly annual precipitations in all the cities
     """
-    def sum_rows(columns):
-        return columns.apply(np.sum, 'columns')
+    def sum_rows(rows):
+        return rows.apply(np.sum, 'columns')
 
     return sum_rows(cities) / sum_rows(observations)
 
