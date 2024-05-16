@@ -52,12 +52,9 @@ def precipitation_quarters_for_each_city(precipitations):
     return list(map(sum_quarters, precipitations))
 
 
-row_of_lowest_precip = row_of_city_with_lowest_precipitation(totals)
-print(f"Row with lowest total precipitation:\n{row_of_lowest_precip}")
-average_monthly_precipitations = average_monthly_precipitation(totals, counts)
-print(f"Average precipitation in each month:\n{average_monthly_precipitations}")
-average_precip_in_cities = average_precipitation_in_cites(totals, counts)
-print(f"Average precipitation in each city:\n{average_precip_in_cities}")
+print("Row with lowest total precipitation:\n", row_of_city_with_lowest_precipitation(totals), sep='')
+print("Average precipitation in each month:\n", average_monthly_precipitation(totals, counts), sep='')
+print("Average precipitation in each city:\n", average_precipitation_in_cites(totals, counts), sep='')
 
 
 def format_row(width, row):
@@ -70,7 +67,5 @@ quarters = precipitation_quarters_for_each_city(totals)
 length_of_largest_number = len(str(max(chain.from_iterable(quarters))))
 info = list(map(ft.partial(format_row, length_of_largest_number), quarters))
 print("Quarterly precipitation totals:")
-print("[", end='')
-print("\n ".join(info), end='')
-print("]")
+print("[", "\n ".join(info), "]", sep='')
 
