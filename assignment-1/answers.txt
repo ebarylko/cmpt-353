@@ -1,0 +1,17 @@
+1. I found that there was not a significant difference in effort when
+reproducing the calculations with Numpy or Pandas. I was able to
+apply the same approach I took when manipulating the data with Numpy to
+when I was using Pandas, making it clear which functions I should be
+searching for in the Pandas library. In my opinion, the calculations
+performed using Pandas are easier to read.
+
+2. The running times of the `pivot_months_pandas` and `pivot_months_loops`
+functions were 4.79 ms and 90.6 ms, respectively. This difference is due to the
+way Pandas stores and manipulates data. Through optimizing data structures
+and operations using implementations of both in C, calculations done using
+Pandas are quicker than if one had solely used Python.
+Therefore, we would expect the runtime of pivot_months_pandas
+to be lower than pivot_months_loops due to more Pandas data structures
+and operations being used in the former file; Comparing the runtimes,
+we see that pivot_months_pandas is 18.9 times faster than
+pivot_months_loops, matching the expectation about the runtimes.
