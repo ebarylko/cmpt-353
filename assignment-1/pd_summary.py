@@ -3,7 +3,6 @@ import numpy as np
 import functools as ft
 import operator as op
 
-
 totals = pd.read_csv('totals.csv').set_index(keys=['name'])
 
 all_observations = pd.read_csv('counts.csv').set_index(keys=["name"])
@@ -28,6 +27,7 @@ def average_monthly_precipitation(cities, observations):
 
     Returns: the average precipitation in all months of the year
     """
+
     def sum_columns(columns):
         return columns.apply(np.sum, "index")
 
@@ -42,12 +42,18 @@ def average_annual_precipitations(cities, observations) -> pd.Series:
 
     Returns: the yearly annual precipitations in all the cities
     """
+
     def sum_rows(rows):
         return rows.apply(np.sum, 'columns')
 
     return sum_rows(cities) / sum_rows(observations)
 
 
-print(city_with_lowest_precipitation(totals))
-print(average_monthly_precipitation(totals, all_observations))
-print(average_annual_precipitations(totals, all_observations))
+def print_data_under_title(title, data):
+    print(title, data, sep='\n')
+
+
+print_data_under_title("City with lowest total precipitation:", city_with_lowest_precipitation(totals))
+print_data_under_title("Average precipitation in each month:", average_monthly_precipitation(totals, all_observations))
+print_data_under_title("Average precipitation in each city:", average_annual_precipitations(totals, all_observations))
+

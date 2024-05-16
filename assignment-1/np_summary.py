@@ -68,4 +68,3 @@ length_of_largest_number = len(str(max(chain.from_iterable(quarters))))
 info = list(map(ft.partial(format_row, length_of_largest_number), quarters))
 print("Quarterly precipitation totals:")
 print("[", "\n ".join(info), "]", sep='')
-
