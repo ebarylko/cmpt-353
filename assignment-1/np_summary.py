@@ -1,6 +1,7 @@
 import numpy as np
 import operator as op
 import functools as ft
+from itertools import chain, repeat
 
 data = np.load('monthdata.npz')
 totals = data['totals']
@@ -22,6 +23,7 @@ def row_of_city_with_lowest_precipitation(cities):
 def average_monthly_precipitation(precipitation, observations):
     def sum_each_month(months):
         return np.sum(months, 0)
+
     p_by_month = sum_each_month(precipitation)
     o_by_month = sum_each_month(observations)
     return np.divide(p_by_month, o_by_month)
@@ -36,6 +38,7 @@ def average_precipitation_in_cites(cities, observations):
     Returns: returns a collection of the average precipitations for each city
 
     """
+
     def sum_each_row(rows):
         return np.sum(rows, 1)
 
@@ -45,11 +48,29 @@ def average_precipitation_in_cites(cities, observations):
 def precipitation_quarters_for_each_city(precipitations):
     def sum_quarters(row):
         return [sum(row[i: i + 3]) for i in range(0, 12, 3)]
+
     return list(map(sum_quarters, precipitations))
 
 
-print(row_of_city_with_lowest_precipitation(totals))
-print(average_monthly_precipitation(totals, counts))
-print(average_precipitation_in_cites(totals, counts))
-print(precipitation_quarters_for_each_city(totals))
+row_of_lowest_precip = row_of_city_with_lowest_precipitation(totals)
+print(f"Row with lowest total precipitation:\n{row_of_lowest_precip}")
+average_monthly_precipitations = average_monthly_precipitation(totals, counts)
+print(f"Average precipitation in each month:\n{average_monthly_precipitations}")
+average_precip_in_cities = average_precipitation_in_cites(totals, counts)
+print(f"Average precipitation in each city:\n{average_precip_in_cities}")
+
+
+def format_row(width, row):
+    fmt = f"{{:>{width}}}"
+    fmt_row = " ".join(repeat(fmt, 4))
+    return f"[{fmt_row}]".format(*row)
+
+
+quarters = precipitation_quarters_for_each_city(totals)
+length_of_largest_number = len(str(max(chain.from_iterable(quarters))))
+info = list(map(ft.partial(format_row, length_of_largest_number), quarters))
+print("Quarterly precipitation totals:")
+print("[", end='')
+print("\n ".join(info), end='')
+print("]")
 
