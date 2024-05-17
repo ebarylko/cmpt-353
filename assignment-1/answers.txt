@@ -6,7 +6,7 @@ searching for in the Pandas library. In my opinion, the calculations
 performed using Pandas are easier to read.
 
 2. The running times of the pivot_months_pandas and pivot_months_loops
-functions were 4.79 ms and 90.6 ms, respectively. This difference is due to the
+functions were 5.66 ms ± 302 µs and 96 ms ± 273 µs, respectively. This difference is due to the
 way Pandas stores and manipulates data. Through optimizing data structures
 and operations using implementations of both in C, calculations done using
 Pandas are quicker than if one had solely used Python.
