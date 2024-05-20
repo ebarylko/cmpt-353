@@ -31,7 +31,8 @@ def pages_common_to_both_files(file_1, file_2):
     """
     pages_in_file_1 = pages_and_views(file_1)
     pages_in_file_2 = pages_and_views(file_2)
-    return pd.merge(pages_in_file_1, pages_in_file_2, on="page")
+    return (pd.merge(pages_in_file_1, pages_in_file_2, on="page").
+            rename(columns={"views_x": "hour_1", "views_y": "hour_2"}))
 
 
 def plot_data_with_title_and_axes(data, title, x_axis, y_axis):
@@ -61,11 +62,12 @@ if not os.getenv("TESTING"):
 
     plt.subplot(1, 2, 2)
     pages_in_both_hours = pages_common_to_both_files(sys.argv[1], sys.argv[2])
-    plt.plot(pages_in_both_hours["views_x"], pages_in_both_hours["views_y"], 'o')
+    pages_in_first_hr, pages_in_second_hr = pages_in_both_hours['hour_1'], pages_in_both_hours['hour_2']
+    plot_data_with_title_and_axes((pages_in_first_hr, pages_in_second_hr),
+                                  "Comparing the viewings of a page in consecutive hours",
+                                  "Views in the first hour",
+                                  "Views in the second hour")
     plt.xscale("log")
     plt.yscale("log")
-    plt.xlabel("Views in the first hour")
-    plt.ylabel("Views in the second hour")
-    plt.title("Comparing the viewings of a page in consecutive hours")
     plt.savefig('wikipedia.png')
     plt.show()
