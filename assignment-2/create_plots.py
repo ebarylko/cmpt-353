@@ -34,14 +34,30 @@ def pages_common_to_both_files(file_1, file_2):
     return pd.merge(pages_in_file_1, pages_in_file_2, on="page")
 
 
+def plot_data_with_title_and_axes(data, title, x_axis, y_axis):
+    """
+    Args:
+        data: the data to be plotted
+        title: the title of the graph
+        x_axis: the label for the x-axis
+        y_axis: the label for the y-axis
+
+    Returns: plots the data using the title and axes labels passed
+    """
+    plt.plot(*data)
+    plt.xlabel(x_axis)
+    plt.ylabel(y_axis)
+    plt.title(title)
+
+
 if not os.getenv("TESTING"):
     plt.figure(figsize=(10, 5))
     plt.subplot(1, 2, 1)
     first_hour_views = sort_views_descending(sys.argv[1])
-    plt.xlabel("Popularity ranking")
-    plt.ylabel("Number of views")
-    plt.title("Comparing page popularity and page views")
-    plt.plot(first_hour_views)
+    plot_data_with_title_and_axes((first_hour_views,),
+                                  "Comparing page popularity and page views",
+                                  "Popularity ranking",
+                                  "Number of views")
 
     plt.subplot(1, 2, 2)
     pages_in_both_hours = pages_common_to_both_files(sys.argv[1], sys.argv[2])
@@ -51,5 +67,5 @@ if not os.getenv("TESTING"):
     plt.xlabel("Views in the first hour")
     plt.ylabel("Views in the second hour")
     plt.title("Comparing the viewings of a page in consecutive hours")
-    # plt.show()
-
+    plt.savefig('wikipedia.png')
+    plt.show()
