@@ -18,7 +18,6 @@ def extract_rating(tweet):
     return np.nan if not match else process_rating(match.group())
 
 
-
 def test_extract_rating():
     npt.assert_equal(extract_rating("@Wibblywobblykid no dollar sign just the whole number should work"), np.nan)
     npt.assert_equal(extract_rating("This is Oakley. He picked you some flowers. Hopes they’re your favorite color. "
