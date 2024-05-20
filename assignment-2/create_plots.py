@@ -35,17 +35,18 @@ def pages_common_to_both_files(file_1, file_2):
             rename(columns={"views_x": "hour_1", "views_y": "hour_2"}))
 
 
-def plot_data_with_title_and_axes(data, title, x_axis, y_axis):
+def plot_data_with_title_and_axes(data, title, x_axis, y_axis, fmt='-'):
     """
     Args:
         data: the data to be plotted
         title: the title of the graph
         x_axis: the label for the x-axis
         y_axis: the label for the y-axis
+        fmt: a collection of options controlling the appearance of the graph
 
     Returns: plots the data using the title and axes labels passed
     """
-    plt.plot(*data)
+    plt.plot(*data, fmt)
     plt.xlabel(x_axis)
     plt.ylabel(y_axis)
     plt.title(title)
@@ -66,8 +67,8 @@ if not os.getenv("TESTING"):
     plot_data_with_title_and_axes((pages_in_first_hr, pages_in_second_hr),
                                   "Comparing the viewings of a page in consecutive hours",
                                   "Views in the first hour",
-                                  "Views in the second hour")
+                                  "Views in the second hour",
+                                  "o")
     plt.xscale("log")
     plt.yscale("log")
     plt.savefig('wikipedia.png')
-    plt.show()
