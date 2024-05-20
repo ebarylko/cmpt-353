@@ -51,5 +51,5 @@ if not os.getenv("TESTING"):
     plt.xlabel("Views in the first hour")
     plt.ylabel("Views in the second hour")
     plt.title("Comparing the viewings of a page in consecutive hours")
-    plt.show()
+    # plt.show()
 
