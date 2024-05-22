@@ -37,7 +37,7 @@ def dates_and_ratings_of_tweets(tweets):
     contains a rating of the form x/10, where x is in [0, 24]
     """
     def validate_ratings(rating):
-        return np.nan if rating not in range(0, 25) else rating
+        return np.nan if rating not in range(0, 26) else rating
 
     def remove_invalid_ratings(tweet_coll):
         tweets_cpy = tweet_coll.copy()
