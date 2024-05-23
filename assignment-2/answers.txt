@@ -1,0 +1,17 @@
+1. The result of `data['timestamp']*fit.slope + fit.intercept`
+represents the best fit line for our data. The type of the best fit line is a
+Pandas Series of type float64.
+2.
+In the same hint, why does this produce a fit line on the graph?
+ Why are the created_at values and timestamp values paired correctly
+ to make points on the plot?
+ We have an
+ Even though we change the dates from a datetime to the time in seconds,
+ we still have the correspondence between the datetime and the rating it is
+ associated to.
+
+For each pair of the date and the rating on that date, it can be mapped to
+a pair of the seconds since the epoch and the rating for that date.
+Since we have a one to one correspondence, creating the best fit line
+using the timestamp for each date and the ratings will produce one that
+approximates our data well
