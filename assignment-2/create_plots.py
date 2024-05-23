@@ -2,37 +2,42 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import numpy as np
 
 
-def pages_and_views(file_name):
+def read_pages_and_views(file_name) -> pd.DataFrame:
     return pd.read_csv(file_name, sep=' ', header=None, index_col=1,
                        names=['lang', 'page', 'views', 'bytes'])
 
 
-def sort_views_descending(file_name):
+def read_csv(file_name: str) -> pd.DataFrame:
+    return pd.read_csv(file_name, sep=' ', header=None, index_col=1,
+                       names=['lang', 'page', 'views', 'bytes'])
+
+
+def sort_descending(s: pd.Series) -> np.array:
     """
     Args:
-        file_name: the name of a file where each line contains the name of a
-        Wikipedia page, the language used for the page, the number of times the page has been viewed
-        in the current hour, and the number of bytes transferred
+        s: a series to sort
 
     Returns: the number of times each page has been viewed in decreasing order
     """
-    return pages_and_views(file_name)['views'].sort_values(ascending=False).to_numpy()
+    return s.sort_values(ascending=False).to_numpy()
 
 
-def pages_common_to_both_files(file_1, file_2):
+def views_of_pages_common_to_both_files(df_1: pd.DataFrame, df_2: pd.DataFrame):
     """
     Args:
-        file_1: a file containing the pages viewed in the first hour
-        file_2: a file containing the pages viewed in the second hour
+       df_1: a Dataframe with pages viewed
+       df_2: a Dataframe with pages viewed
 
-    Returns: the pages which appear in both files
+    Both Dataframes have the following format:
+    language, name, views, transferred
+    Returns: the views of the Wikipedia pages which appear in both Dataframes
     """
-    pages_in_file_1 = pages_and_views(file_1)
-    pages_in_file_2 = pages_and_views(file_2)
-    return (pd.merge(pages_in_file_1, pages_in_file_2, on="page").
-            rename(columns={"views_x": "hour_1", "views_y": "hour_2"}))
+    pages_in_both_files = (pd.merge(df_1, df_2, on="page").
+                           rename(columns={"views_x": "hour_1", "views_y": "hour_2"}))
+    return pages_in_both_files["hour_1"], pages_in_both_files["hour_2"]
 
 
 def plot_data_with_title_and_axes(data, title, x_axis, y_axis, fmt='-'):
@@ -44,7 +49,7 @@ def plot_data_with_title_and_axes(data, title, x_axis, y_axis, fmt='-'):
         y_axis: the label for the y-axis
         fmt: a collection of options controlling the appearance of the graph
 
-    Returns: plots the data using the title and axes labels passed
+    Returns: Creates a graph using the data, title, axes labels, and formatting options passed
     """
     plt.plot(*data, fmt)
     plt.xlabel(x_axis)
@@ -52,20 +57,26 @@ def plot_data_with_title_and_axes(data, title, x_axis, y_axis, fmt='-'):
     plt.title(title)
 
 
-if not os.getenv("TESTING"):
+def plot_popularity_against_views(pages_and_views: pd.DataFrame):
     plt.figure(figsize=(10, 5))
     plt.subplot(1, 2, 1)
-    first_hour_views = sort_views_descending(sys.argv[1])
-    plot_data_with_title_and_axes((first_hour_views,),
-                                  "Comparing page popularity and page views",
+    views = sort_descending(pages_and_views['views'])
+    plot_data_with_title_and_axes((views,),
+                                  "Page popularity vs page views",
                                   "Popularity ranking",
                                   "Number of views")
 
+
+if not os.getenv("TESTING"):
+    fst_hour_pages = read_csv(sys.argv[1])
+    plot_popularity_against_views(fst_hour_pages)
+
     plt.subplot(1, 2, 2)
-    pages_in_both_hours = pages_common_to_both_files(sys.argv[1], sys.argv[2])
-    pages_in_first_hr, pages_in_second_hr = pages_in_both_hours['hour_1'], pages_in_both_hours['hour_2']
-    plot_data_with_title_and_axes((pages_in_first_hr, pages_in_second_hr),
-                                  "Comparing the viewings of a page in consecutive hours",
+
+    snd_hour_pages = read_csv(sys.argv[2])
+    views_in_first_hr, views_in_second_hr = views_of_pages_common_to_both_files(fst_hour_pages, snd_hour_pages)
+    plot_data_with_title_and_axes((views_in_first_hr, views_in_second_hr),
+                                  "Comparing page visits in consecutive hours",
                                   "Views in the first hour",
                                   "Views in the second hour",
                                   "o")

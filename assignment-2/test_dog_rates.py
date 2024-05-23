@@ -34,10 +34,10 @@ def dates_and_ratings_of_tweets(tweets):
         the tweet, and the content of the tweet
 
     Returns: a DataFrame where each row has a date and rating of a tweet which
-    contains a rating of the form x/10, where x is in [0, 24]
+    contains a rating of the form x/10, where x is in [0, 25]
     """
     def validate_ratings(rating):
-        return np.nan if rating not in range(0, 26) else rating
+        return np.nan if rating > 25 else rating
 
     def remove_invalid_ratings(tweet_coll):
         tweets_cpy = tweet_coll.copy()
@@ -57,7 +57,9 @@ sample_tweets = pd.DataFrame({'id': [1, 2, 3],
 expected_dates_and_ratings = pd.DataFrame({'rating': [10, 19],
                                            'created_at': [pd.Timestamp('2018-05-12 20:36:44'),
                                                           pd.Timestamp('2018-05-13 20:36:44')]}).set_index('rating')
-
-
+print(expected_dates_and_ratings)
+print(dates_and_ratings_of_tweets(sample_tweets))
 def test_dates_and_ratings_of_tweets():
-    pdt.assert_frame_equal(dates_and_ratings_of_tweets(sample_tweets), expected_dates_and_ratings, check_index_type=False)
+    pdt.assert_frame_equal(dates_and_ratings_of_tweets(sample_tweets),
+                           expected_dates_and_ratings,
+                           check_index_type=False)
