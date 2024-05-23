@@ -13,10 +13,10 @@ def sort_views_descending(file_name):
     """
     Args:
         file_name: the name of a file where each line contains the name of a
-        Wikipedia page and the number of times it has been viewed in the current hour
+        Wikipedia page, the language used for the page, the number of times the page has been viewed
+        in the current hour, and the number of bytes transferred
 
-    Returns: a collection containing the number of times each page has been
-    viewed sorting decreasingly
+    Returns: the number of times each page has been viewed in decreasing order
     """
     return pages_and_views(file_name)['views'].sort_values(ascending=False).to_numpy()
 
