@@ -67,6 +67,17 @@ def plot_popularity_against_views(pages_and_views: pd.DataFrame):
                                   "Number of views")
 
 
+def plot_fst_hr_views_against_snd_hr_views(fst_hr_pages, snd_hr_pages):
+    plt.xscale("log")
+    plt.yscale("log")
+    views = views_of_pages_common_to_both_files(fst_hour_pages, snd_hour_pages)
+    plot_data_with_title_and_axes(views,
+                                  "Comparing page visits in consecutive hours",
+                                  "Views in the first hour",
+                                  "Views in the second hour",
+                                  "o")
+
+
 if not os.getenv("TESTING"):
     fst_hour_pages = read_csv(sys.argv[1])
     plot_popularity_against_views(fst_hour_pages)
@@ -74,12 +85,5 @@ if not os.getenv("TESTING"):
     plt.subplot(1, 2, 2)
 
     snd_hour_pages = read_csv(sys.argv[2])
-    views_in_first_hr, views_in_second_hr = views_of_pages_common_to_both_files(fst_hour_pages, snd_hour_pages)
-    plot_data_with_title_and_axes((views_in_first_hr, views_in_second_hr),
-                                  "Comparing page visits in consecutive hours",
-                                  "Views in the first hour",
-                                  "Views in the second hour",
-                                  "o")
-    plt.xscale("log")
-    plt.yscale("log")
+    plot_fst_hr_views_against_snd_hr_views(fst_hour_pages, snd_hour_pages)
     plt.savefig('wikipedia.png')

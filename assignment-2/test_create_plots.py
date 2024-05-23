@@ -6,20 +6,22 @@ import pandas.testing as pdt
 
 expected_views = [10, 2, 1]
 
-
-def test_sort_pages_by_view():
-    npt.assert_equal(cp.sort_views_descending("sample_plots_sample_1.txt"), expected_views)
+sample = pd.Series(data=[1, 10, 2], index=["a", "b", "c"])
 
 
-expected_pages = pd.DataFrame({"page": ["Athol_Moffitt"], "lang_x": "en", "hour_1": [1], "bytes_x": 0,
-                               "lang_y": "en", "hour_2": [3], "bytes_y": 0}).set_index("page")
+def test_sort_descending():
+    npt.assert_equal(cp.sort_descending(sample), expected_views)
+
 
 expected_views_fst_hr = pd.Series([1], index=["Athol_Moffitt"])
 expected_views_snd_hr = pd.Series([3], index=["Athol_Moffitt"])
-actual_views_fst_hr, actual_views_snd_hr = cp.views_of_pages_common_to_both_files("sample_plots_sample_1.txt",
-                                                                                  "sample_plots_sample_2.txt")
+sample_frame_1 = pd.DataFrame({"page": ["Athol_Moffitt", "b"], 'lang': ['en', 'en'], 'views': [1, 2], 'bytes': [0, 0]}).set_index("page")
+sample_frame_2 = pd.DataFrame({"page": ["Athol_Moffitt"], 'lang': ['en'], 'views': [3], 'bytes': [0]}).set_index("page")
 
 
-def test_pages_common_to_both_files():
+actual_views_fst_hr, actual_views_snd_hr = cp.views_of_pages_common_to_both_files(sample_frame_1, sample_frame_2)
+
+
+def test_views_of_pages_common_to_both_files():
     pdt.assert_series_equal(expected_views_fst_hr, actual_views_fst_hr, check_names=False)
     pdt.assert_series_equal(expected_views_snd_hr, actual_views_snd_hr, check_names=False)
