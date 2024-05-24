@@ -62,9 +62,9 @@ def plot_popularity_against_views(pages_and_views: pd.DataFrame):
     plt.subplot(1, 2, 1)
     views = sort_descending(pages_and_views['views'])
     plot_data_with_title_and_axes((views,),
-                                  "Page popularity vs page views",
-                                  "Popularity ranking",
-                                  "Number of views")
+                                  "Page Popularity vs. Page Views",
+                                  "Popularity Ranking",
+                                  "Number of Views")
 
 
 def plot_fst_hr_views_against_snd_hr_views(fst_hr_pages, snd_hr_pages):
@@ -72,9 +72,9 @@ def plot_fst_hr_views_against_snd_hr_views(fst_hr_pages, snd_hr_pages):
     plt.yscale("log")
     views = views_of_pages_common_to_both_files(fst_hour_pages, snd_hour_pages)
     plot_data_with_title_and_axes(views,
-                                  "Comparing page visits in consecutive hours",
-                                  "Views in the first hour",
-                                  "Views in the second hour",
+                                  "Comparing Page Visits in Consecutive Hours",
+                                  "Views in the First Hour",
+                                  "Views in the Second Hour",
                                   "o")
 
 
