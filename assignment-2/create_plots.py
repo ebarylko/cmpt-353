@@ -85,5 +85,6 @@ if not os.getenv("TESTING"):
     plt.subplot(1, 2, 2)
 
     snd_hour_pages = read_csv(sys.argv[2])
+
     plot_fst_hr_views_against_snd_hr_views(fst_hour_pages, snd_hour_pages)
     plt.savefig('wikipedia.png')
