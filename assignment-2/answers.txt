@@ -1,0 +1,9 @@
+1. The expression  data['timestamp']*fit.slope + fit.intercept
+represents the best fit line for our data. The type of the best fit line is a
+Pandas Series of type float64.
+2. Every value in created_at can be mapped to one value in timestamp by
+representing a date by the number of seconds since the epoch. Therefore,
+every point on the best fit line, which uses the values in timestamp,
+can be mapped to a specific date in created_at. As a result, we have a fit
+line that approximates our data by pairing together the date and the
+estimated rating for that date.
