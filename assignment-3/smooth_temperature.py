@@ -14,25 +14,24 @@ def plot_kalman_filtering(df: pd.DataFrame):
     @return: plots the results of the Kalman filtering on df
     """
     kalman_data = df[['temperature', 'cpu_percent', 'sys_load_1', 'fan_rpm']]
-    tmp_deviation = kalman_data['temperature'].std()
-    cpu_deviation = kalman_data['cpu_percent'].std()
-    load_deviation = kalman_data['sys_load_1'].std()
-    fan_deviation = kalman_data['fan_rpm'].std()
+    tmp_deviation = kalman_data['temperature'].var()
+    cpu_deviation = kalman_data['cpu_percent'].var()
+    load_deviation = kalman_data['sys_load_1'].var()
+    fan_deviation = kalman_data['fan_rpm'].var()
 
-    print(kalman_data.values)
     initial_state = kalman_data.iloc[0]
-    observation_covariance = np.diag([tmp_deviation, cpu_deviation, load_deviation, fan_deviation])
-    transition_covariance = np.diag([2, 0.2, 0.01, 20])
+    observation_covariance = np.diag([5, 0.02, 0.3, 15])
+    transition_covariance = np.diag([4, 0.01, 0.2, 8]) ** 2
     transition = [[0.94, 0.5, 0.2, -0.001], [0.1, 0.4, 2.1, 0], [0, 0, 0.94, 0], [0, 0, 0, 1]]
 
     kf = KalmanFilter(
-        initial_state_mean=kalman_data.values,
+        initial_state_mean=initial_state,
         transition_matrices=transition,
         transition_covariance=transition_covariance,
         observation_covariance=observation_covariance
     )
-    # kf_smoothed, _ = kf.smooth(kalman_data)
-    # plt.plot(df['timestamp'], kf_smoothed[:, 0], 'g-')
+    kf_smoothed, _ = kf.smooth(kalman_data)
+    plt.plot(df['timestamp'], kf_smoothed[:, 0], 'g-')
 
 
 def print_data_lowess_and_kalman(df: pd.DataFrame):
@@ -54,6 +53,6 @@ def print_data_lowess_and_kalman(df: pd.DataFrame):
     plot_kalman_filtering(df)
     plt.legend(['Measurements', 'Lowess', 'Kalman'])
     plt.savefig('data.png')
-
+    plt.show()
 
 print_data_lowess_and_kalman(data)
