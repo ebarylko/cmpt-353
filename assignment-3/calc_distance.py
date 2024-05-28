@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as et
 from datetime import datetime
 
-namespaces = {"pre": "http://www.topografix.com/GPX/1/0"}
+ns = "{http://www.topografix.com/GPX/1/0}"
 
 
 def get_lat_lon_and_date(file_name):
@@ -11,10 +11,15 @@ def get_lat_lon_and_date(file_name):
     @return: returns three collections where the first is the latitudes of all the observations, the second is
     the longitudes of all the observations, and the third is the date of all the observations
     """
-    all_triplets = []
+    def lat_lon_date(observation):
+        """
+        @param observation: an observation containing the latitude, longitude, and date of observation
+        @return: a tuple containing the latitude, longitude, and date
+        """
+        return (float(observation.get("lat")),
+                float(observation.get("lon")),
+                observation.find('{http://www.topografix.com/GPX/1/0}time').text)
+
     observations = et.parse(file_name).getroot().iter('{http://www.topografix.com/GPX/1/0}trkpt')
-    for observation in observations:
-        all_triplets.append([float(observation.get("lat")),
-                             float(observation.get("lon")),
-                             observation.find('{http://www.topografix.com/GPX/1/0}time').text])
-    return list(zip(*all_triplets))
+    lat_lon_and_dates = map(lat_lon_date, observations)
+    return list(zip(*lat_lon_and_dates))
