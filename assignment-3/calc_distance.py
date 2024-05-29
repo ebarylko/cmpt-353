@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as et
 from datetime import datetime
 import pandas as pd
+from itertools import pairwise
+
 
 ns = "{http://www.topografix.com/GPX/1/0}"
 
@@ -29,7 +31,7 @@ def get_lat_lon_and_date(file_name: str) -> pd.DataFrame:
 
 
 def read_compass_readings(file_name) -> pd.DataFrame:
-    return pd.read_csv(file_name)
+    return pd.read_csv(file_name, parse_dates=['datetime']).rename(columns={"datetime": "date"})
 
 
 def combine_lat_lon_and_date_and_compass_readings(lat_lon_date: pd.DataFrame,
@@ -42,9 +44,12 @@ def combine_lat_lon_and_date_and_compass_readings(lat_lon_date: pd.DataFrame,
     @return: a subset of the two DataFrames joined by the date, where each row contains the latitude,
      longitude, x-coordinate, y-coordinate, and date of an observation
     """
-    return compass_readings.rename(columns={"datetime": "date"}).merge(lat_lon_date, on="date")[
-        ["lat", "lon", "date", "Bx", "By"]]
+    return compass_readings.merge(lat_lon_date, on="date")[["lat", "lon", "date", "Bx", "By"]]
 
+
+compass_readings = read_compass_readings("walk1.csv")
+lat_and_long_readings = get_lat_lon_and_date("walk1.gpx")
+merged_readings = combine_lat_lon_and_date_and_compass_readings(lat_and_long_readings, compass_readings)
 
 def distance(df: pd.DataFrame) -> int:
     """
@@ -52,3 +57,5 @@ def distance(df: pd.DataFrame) -> int:
      y-component, and date
     @return: the sum of the distance between each consecutive pair of observations
     """
+    latitudes = pairwise(df['lat'].values)
+    return latitudes

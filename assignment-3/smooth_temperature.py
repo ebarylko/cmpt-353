@@ -20,8 +20,8 @@ def plot_kalman_filtering(df: pd.DataFrame):
     fan_deviation = kalman_data['fan_rpm'].var()
 
     initial_state = kalman_data.iloc[0]
-    observation_covariance = np.diag([5, 0.02, 0.3, 15])
-    transition_covariance = np.diag([4, 0.01, 0.2, 8]) ** 2
+    observation_covariance = np.diag([1.5, 0.1, 0.1, 10]) ** 2
+    transition_covariance = np.diag([2, 20, 0.6, 100]) ** 2
     transition = [[0.94, 0.5, 0.2, -0.001], [0.1, 0.4, 2.1, 0], [0, 0, 0.94, 0], [0, 0, 0, 1]]
 
     kf = KalmanFilter(
@@ -47,12 +47,13 @@ def print_data_lowess_and_kalman(df: pd.DataFrame):
     dates = df['timestamp']
     plt.plot(dates, temperatures, 'b.', alpha=0.5)
 
-    smoothed_data = lowess(temperatures, dates, frac=0.17)[:, 1]
+    smoothed_data = lowess(temperatures, dates, frac=0.06)[:, 1]
     plt.plot(dates, smoothed_data, 'r-')
 
     plot_kalman_filtering(df)
     plt.legend(['Measurements', 'Lowess', 'Kalman'])
     plt.savefig('data.png')
-    plt.show()
+    # plt.show()
+
 
 print_data_lowess_and_kalman(data)

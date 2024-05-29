@@ -27,9 +27,13 @@ def test_combine_lat_lon_and_date_and_compass_readings():
                            cd.combine_lat_lon_and_date_and_compass_readings(sample_lat_lon_date,
                                                                             sample_compass_readings))
 
-sample_readings = pd.DataFrame({
-    'lat': [49.28, 49.26, 49.26],
-    'lon': [123.00, 123.10, 123.05],
-    "Bx": [1, 2, 3, 4],
-    "BY": [1, 2, 3, 4]})
+
+sample_readings = pd.DataFrame({'lat': [49.28, 49.26, 49.29],
+                                'lon': [123.00, 123.10, 123.05],
+                                "Bx": [1, 2, 3],
+                                "BY": [1, 2, 3]})
+
+
 def test_distance():
+    assert (cd.distance(sample_readings), 6) == 1
+    # assert round(cd.distance(sample_readings), 6) == 11217.038892
