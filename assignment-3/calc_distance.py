@@ -2,9 +2,10 @@ import xml.etree.ElementTree as et
 from datetime import datetime
 import pandas as pd
 import itertools as it
+from functools import reduce
 import os
 import sys
-
+import math as m
 
 ns = "{http://www.topografix.com/GPX/1/0}"
 
@@ -49,15 +50,58 @@ def combine_lat_lon_and_date_and_compass_readings(lat_lon_date: pd.DataFrame,
     return compass_readings.merge(lat_lon_date, on="date")[["lat", "lon", "date", "Bx", "By"]]
 
 
+def get_distance(locations):
+    def diff_between(x, y):
+        return m.radians(x - y) / 2
+
+    earth_radius_in_meters = 6378000
+    fst_lat, fst_lon = locations[0]
+    snd_lat, snd_lon = locations[1]
+    #
+    fst_lat_in_rad = m.radians(fst_lat)
+    snd_lat_in_rad = m.radians(snd_lat)
+    tmp = m.sqrt(m.sin(diff_between(snd_lat, fst_lat) ** 2 +
+                       m.cos(fst_lat_in_rad) * m.cos(snd_lat_in_rad) * (m.sin(diff_between(snd_lon, fst_lon)) ** 2)))
+    return 2 * earth_radius_in_meters * m.asin(tmp)
+
+
+
+def add_distance(curr_distance, consec_locations):
+    """
+    @param curr_distance: the current distance travelled
+    @param consec_locations: a collection of two locations A and B, where each location is given in terms
+    of longitude and latitude
+    @return: the sum of the current distance with the distance between A and B
+    """
+
+    def diff_between(x, y):
+        return m.radians(x - y) / 2
+
+    earth_radius_in_meters = 6378000
+    fst_lat, fst_lon = consec_locations[0]
+    snd_lat, snd_lon = consec_locations[1]
+
+    fst_lat_in_rad = m.radians(fst_lat)
+    snd_lat_in_rad = m.radians(snd_lat)
+    tmp = m.sqrt(m.sin(
+        diff_between(snd_lat, fst_lat) ** 2 +
+                       m.cos(fst_lat_in_rad) * m.cos(snd_lat_in_rad) * (m.sin(diff_between(snd_lon, fst_lon)) ** 2)))
+
+    dst_from_a_to_b = 2 * earth_radius_in_meters * m.asin(tmp)
+    return curr_distance + dst_from_a_to_b
+
 
 def distance(df: pd.DataFrame) -> int:
     """
     @param df: a DataFrame where each row is an observation containing the latitude, longitude, x-component,
      y-component, and date
-    @return: the sum of the distance between each consecutive pair of observations
+    @return: the sum of the distances between each consecutive pair of observations
     """
-    latitudes = it.pairwise(df['lat'].values)
-    return latitudes
+    latitudes = df['lat'].values
+    longitudes = df['lon'].values
+    consec_lat_and_lon_pairs = it.pairwise(zip(latitudes, longitudes))
+    return reduce(add_distance, consec_lat_and_lon_pairs, 0)
+
 
 if not os.getenv("TESTING"):
     compass_readings = read_compass_readings(sys.argv[2])
