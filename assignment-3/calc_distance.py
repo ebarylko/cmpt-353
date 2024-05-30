@@ -108,7 +108,7 @@ def apply_kalman_filter(df: pd.DataFrame) -> pd.DataFrame:
 
     initial_state = df.iloc[0]
     observation_covariance = np.diag([0.004, 0.003, 4, 3]) ** 2
-    transition_covariance = np.diag([0.004, 0.003, 30, 39]) ** 2
+    transition_covariance = np.diag([0.006343, 0.0058343, 40, 39]) ** 2
     transition = [[1, 0, 5 * pow(10, -7), 34 * m.pow(10, -7)],
                   [0, 1, -49 * m.pow(10, -7), 9 * m.pow(10, -7)],
                   [0, 0, 1, 0],
