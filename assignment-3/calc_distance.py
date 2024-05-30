@@ -103,7 +103,18 @@ def distance(df: pd.DataFrame) -> int:
     return reduce(add_distance, consec_lat_and_lon_pairs, 0)
 
 
+def print_distance(df: pd.DataFrame):
+    """
+    @param df: a DataFrame where each row is an observation containing the latitude, longitude, x-component,
+     y-component, and date
+    @return: prints the sum of the distances between each pair of consecutive points
+    """
+    print(f'Unfiltered distance: {distance(df):.2f}')
+
+
 if not os.getenv("TESTING"):
     compass_readings = read_compass_readings(sys.argv[2])
     lat_and_long_readings = get_lat_lon_and_date(sys.argv[1])
     merged_readings = combine_lat_lon_and_date_and_compass_readings(lat_and_long_readings, compass_readings)
+
+    print_distance(merged_readings)
