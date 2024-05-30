@@ -64,7 +64,7 @@ def add_distance(curr_distance, consec_locations):
     def diff_between(x, y):
         return m.radians(x - y) / 2
 
-    earth_radius_in_meters = 6378000
+    earth_radius_in_meters = 6371000
     fst_lat, fst_lon = consec_locations[0]
     snd_lat, snd_lon = consec_locations[1]
 
@@ -107,8 +107,8 @@ def apply_kalman_filter(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     initial_state = df.iloc[0]
-    observation_covariance = np.diag([0.003, 0.004, 4, 3]) ** 2
-    transition_covariance = np.diag([0.009, 0.007, 22, 20]) ** 2
+    observation_covariance = np.diag([0.004, 0.004, 4, 3]) ** 2
+    transition_covariance = np.diag([0.00345, 0.0035, 30, 39]) ** 2
     transition = [[1, 0, 5 * pow(10, -7), 34 * m.pow(10, -7)],
                   [0, 1, -49 * m.pow(10, -7), 9 * m.pow(10, -7)],
                   [0, 0, 1, 0],
@@ -151,5 +151,5 @@ if not os.getenv("TESTING"):
     cleaned_data = apply_kalman_filter(merged_readings)
 
     print(f'Unfiltered distance: {distance(merged_readings):.2f}')
-    print(f'Unfiltered distance: {distance(cleaned_data):.2f}')
+    print(f'Filtered distance: {distance(cleaned_data):.2f}')
     output_gpx(cleaned_data, "out.gpx")

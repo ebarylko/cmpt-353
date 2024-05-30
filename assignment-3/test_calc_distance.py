@@ -45,4 +45,4 @@ sample_readings = pd.DataFrame({'lat': [49.28, 49.26, 49.26],
 
 
 def test_distance():
-    assert cd.distance(sample_readings) == 11217.038892
+    assert round(cd.distance(sample_readings), 6) == 11217.038892
