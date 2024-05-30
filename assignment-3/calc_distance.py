@@ -124,8 +124,8 @@ def print_actual_distance(df: pd.DataFrame):
     """
 
     initial_state = df.iloc[0]
-    observation_covariance = np.diag([0.00001, 0.0027, 7, 3.5]) ** 2
-    transition_covariance = np.diag([4, 2, 40, 30]) ** 2
+    observation_covariance = np.diag([0.1, 0.1, 4, 3]) ** 2
+    transition_covariance = np.diag([0.1, 0.1, 22, 20]) ** 2
     transition = [[1, 0, 5 * pow(10, -7), 34 * m.pow(10, -7)],
                   [0, 1, -49 * m.pow(10, -7), 9 * m.pow(10, -7)],
                   [0, 0, 1, 0],
@@ -134,13 +134,14 @@ def print_actual_distance(df: pd.DataFrame):
                           transition_matrices=transition,
                           transition_covariance=transition_covariance,
                           observation_covariance=observation_covariance)
-    cleaned_data = filter.smooth(df)
-    print(distance(cleaned_data))
+    cleaned_data, _ = filter.smooth(df)
+    print(distance(pd.DataFrame(cleaned_data, columns=["lat", "lon", "Bx", "By"])))
 
 if not os.getenv("TESTING"):
     compass_readings = read_compass_readings(sys.argv[2])
     lat_and_long_readings = get_lat_lon_and_date(sys.argv[1])
     merged_readings = combine_lat_lon_and_date_and_compass_readings(lat_and_long_readings, compass_readings)
-
+    # print(type(merged_readings))
+    # print(merged_readings)
     print_distance(merged_readings)
     print_actual_distance(merged_readings)
