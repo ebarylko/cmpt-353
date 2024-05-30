@@ -53,22 +53,6 @@ def combine_lat_lon_and_date_and_compass_readings(lat_lon_date: pd.DataFrame,
     return compass_readings.merge(lat_lon_date, on="date")[["lat", "lon", "Bx", "By"]]
 
 
-def get_distance(locations):
-    def diff_between(x, y):
-        return m.radians(x - y) / 2
-
-    earth_radius_in_meters = 6378000
-    fst_lat, fst_lon = locations[0]
-    snd_lat, snd_lon = locations[1]
-    #
-    fst_lat_in_rad = m.radians(fst_lat)
-    snd_lat_in_rad = m.radians(snd_lat)
-    tmp = m.sqrt(m.sin(diff_between(snd_lat, fst_lat) ** 2 +
-                       m.cos(fst_lat_in_rad) * m.cos(snd_lat_in_rad) * (m.sin(diff_between(snd_lon, fst_lon)) ** 2)))
-    return 2 * earth_radius_in_meters * m.asin(tmp)
-
-
-
 def add_distance(curr_distance, consec_locations):
     """
     @param curr_distance: the current distance travelled
@@ -115,17 +99,16 @@ def print_distance(df: pd.DataFrame):
     print(f'Unfiltered distance: {distance(df):.2f}')
 
 
-def print_actual_distance(df: pd.DataFrame):
+def apply_kalman_filter(df: pd.DataFrame) -> pd.DataFrame:
     """
     @param df: a DataFrame where each row is an observation containing the latitude, longitude, x-component,
      y-component, and date
-    @return: prints the sum of the distances between each pair of consecutive points after cleaning the
-    data using a Kalman filter
+    @return: returns a DataFrame consisting of the data after applying a Kalman filter to it
     """
 
     initial_state = df.iloc[0]
-    observation_covariance = np.diag([0.1, 0.1, 4, 3]) ** 2
-    transition_covariance = np.diag([0.1, 0.1, 22, 20]) ** 2
+    observation_covariance = np.diag([0.003, 0.004, 4, 3]) ** 2
+    transition_covariance = np.diag([0.009, 0.007, 22, 20]) ** 2
     transition = [[1, 0, 5 * pow(10, -7), 34 * m.pow(10, -7)],
                   [0, 1, -49 * m.pow(10, -7), 9 * m.pow(10, -7)],
                   [0, 0, 1, 0],
@@ -135,13 +118,38 @@ def print_actual_distance(df: pd.DataFrame):
                           transition_covariance=transition_covariance,
                           observation_covariance=observation_covariance)
     cleaned_data, _ = filter.smooth(df)
-    print(distance(pd.DataFrame(cleaned_data, columns=["lat", "lon", "Bx", "By"])))
+    return pd.DataFrame(cleaned_data, columns=["lat", "lon", "Bx", "By"])
+
+
+def output_gpx(points, output_filename):
+    """
+    Output a GPX file with latitude and longitude from the points DataFrame.
+    """
+    from xml.dom.minidom import getDOMImplementation
+    def append_trkpt(pt, trkseg, doc):
+        trkpt = doc.createElement('trkpt')
+        trkpt.setAttribute('lat', '%.7f' % (pt['lat']))
+        trkpt.setAttribute('lon', '%.7f' % (pt['lon']))
+        trkseg.appendChild(trkpt)
+
+    doc = getDOMImplementation().createDocument(None, 'gpx', None)
+    trk = doc.createElement('trk')
+    doc.documentElement.appendChild(trk)
+    trkseg = doc.createElement('trkseg')
+    trk.appendChild(trkseg)
+
+    points.apply(append_trkpt, axis=1, trkseg=trkseg, doc=doc)
+
+    with open(output_filename, 'w') as fh:
+        doc.writexml(fh, indent=' ')
+
 
 if not os.getenv("TESTING"):
     compass_readings = read_compass_readings(sys.argv[2])
     lat_and_long_readings = get_lat_lon_and_date(sys.argv[1])
     merged_readings = combine_lat_lon_and_date_and_compass_readings(lat_and_long_readings, compass_readings)
-    # print(type(merged_readings))
-    # print(merged_readings)
-    print_distance(merged_readings)
-    print_actual_distance(merged_readings)
+    cleaned_data = apply_kalman_filter(merged_readings)
+
+    print(f'Unfiltered distance: {distance(merged_readings):.2f}')
+    print(f'Unfiltered distance: {distance(cleaned_data):.2f}')
+    output_gpx(cleaned_data, "out.gpx")
