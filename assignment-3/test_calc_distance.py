@@ -24,7 +24,7 @@ def test_read_compass_readings():
     pdt.assert_frame_equal(expected_compass_readings, cd.read_compass_readings("ex.csv"))
 
 
-expected_data = pd.DataFrame({"lat": [1], "lon": [2], "date": [pd.to_datetime("2022-04-01")], "Bx": [3], "By": [4]})
+expected_data = pd.DataFrame({"lat": [1], "lon": [2], "Bx": [3], "By": [4]})
 sample_lat_lon_date = pd.DataFrame({"lat": [1, 2],
                                     "lon": [2, 3],
                                     "date": [pd.to_datetime("2022-04-01"), pd.to_datetime("2022-07-01")]})

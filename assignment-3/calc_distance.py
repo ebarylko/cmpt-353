@@ -1,11 +1,14 @@
 import xml.etree.ElementTree as et
 from datetime import datetime
 import pandas as pd
-import itertools as it
+import numpy as np
+from itertools import pairwise
 from functools import reduce
 import os
 import sys
 import math as m
+import matplotlib.pyplot as plt
+from pykalman import KalmanFilter
 
 ns = "{http://www.topografix.com/GPX/1/0}"
 
@@ -47,7 +50,7 @@ def combine_lat_lon_and_date_and_compass_readings(lat_lon_date: pd.DataFrame,
     @return: a subset of the two DataFrames joined by the date, where each row contains the latitude,
      longitude, x-coordinate, y-coordinate, and date of an observation
     """
-    return compass_readings.merge(lat_lon_date, on="date")[["lat", "lon", "date", "Bx", "By"]]
+    return compass_readings.merge(lat_lon_date, on="date")[["lat", "lon", "Bx", "By"]]
 
 
 def get_distance(locations):
@@ -99,7 +102,7 @@ def distance(df: pd.DataFrame) -> int:
     """
     latitudes = df['lat'].values
     longitudes = df['lon'].values
-    consec_lat_and_lon_pairs = it.pairwise(zip(latitudes, longitudes))
+    consec_lat_and_lon_pairs = pairwise(zip(latitudes, longitudes))
     return reduce(add_distance, consec_lat_and_lon_pairs, 0)
 
 
@@ -112,9 +115,32 @@ def print_distance(df: pd.DataFrame):
     print(f'Unfiltered distance: {distance(df):.2f}')
 
 
+def print_actual_distance(df: pd.DataFrame):
+    """
+    @param df: a DataFrame where each row is an observation containing the latitude, longitude, x-component,
+     y-component, and date
+    @return: prints the sum of the distances between each pair of consecutive points after cleaning the
+    data using a Kalman filter
+    """
+
+    initial_state = df.iloc[0]
+    observation_covariance = np.diag([0.00001, 0.0027, 7, 3.5]) ** 2
+    transition_covariance = np.diag([4, 2, 40, 30]) ** 2
+    transition = [[1, 0, 5 * pow(10, -7), 34 * m.pow(10, -7)],
+                  [0, 1, -49 * m.pow(10, -7), 9 * m.pow(10, -7)],
+                  [0, 0, 1, 0],
+                  [0, 0, 0, 1]]
+    filter = KalmanFilter(initial_state_mean=initial_state,
+                          transition_matrices=transition,
+                          transition_covariance=transition_covariance,
+                          observation_covariance=observation_covariance)
+    cleaned_data = filter.smooth(df)
+    print(distance(cleaned_data))
+
 if not os.getenv("TESTING"):
     compass_readings = read_compass_readings(sys.argv[2])
     lat_and_long_readings = get_lat_lon_and_date(sys.argv[1])
     merged_readings = combine_lat_lon_and_date_and_compass_readings(lat_and_long_readings, compass_readings)
 
     print_distance(merged_readings)
+    print_actual_distance(merged_readings)
