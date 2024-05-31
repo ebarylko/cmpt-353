@@ -1,13 +1,14 @@
+"""
+Assignment three functions to calculate distance between two points
+"""
 import xml.etree.ElementTree as et
-from datetime import datetime
-import pandas as pd
-import numpy as np
-from itertools import pairwise
-from functools import reduce
 import os
 import sys
 import math as m
-import matplotlib.pyplot as plt
+from itertools import pairwise
+from functools import reduce
+import pandas as pd
+import numpy as np
 from pykalman import KalmanFilter
 
 
@@ -35,6 +36,9 @@ def get_lat_lon_and_date(file_name: str) -> pd.DataFrame:
 
 
 def read_compass_readings(file_name) -> pd.DataFrame:
+    """
+    Takes a file name and returns a DataFrame containing the compass readings associated with a specific date
+    """
     return pd.read_csv(file_name, parse_dates=['datetime']).rename(columns={"datetime": "date"})[["date", "Bx", "By"]]
 
 
@@ -62,6 +66,9 @@ def add_distance(curr_distance, consec_locations):
     def diff_between(x, y):
         return m.radians(x - y) / 2
 
+    def sin_squared(x, y):
+        return m.sin(diff_between(y, x)) ** 2
+
     earth_radius_in_meters = 6371000
     fst_lat, fst_lon = consec_locations[0]
     snd_lat, snd_lon = consec_locations[1]
@@ -69,8 +76,7 @@ def add_distance(curr_distance, consec_locations):
     fst_lat_in_rad = m.radians(fst_lat)
     snd_lat_in_rad = m.radians(snd_lat)
     tmp = m.sqrt(
-        m.sin(diff_between(snd_lat, fst_lat)) ** 2 +
-        m.cos(fst_lat_in_rad) * m.cos(snd_lat_in_rad) * (m.sin(diff_between(snd_lon, fst_lon)) ** 2)
+        sin_squared(fst_lat, snd_lat) + m.cos(fst_lat_in_rad) * m.cos(snd_lat_in_rad) * sin_squared(fst_lon, snd_lon)
     )
 
     dst_from_a_to_b = 2 * earth_radius_in_meters * m.asin(tmp)
