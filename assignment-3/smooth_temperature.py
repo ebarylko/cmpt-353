@@ -53,7 +53,6 @@ def print_data_lowess_and_kalman(df: pd.DataFrame):
     plot_kalman_filtering(df)
     plt.legend(['Measurements', 'Lowess', 'Kalman'])
     plt.savefig('data.png')
-    # plt.show()
 
 
 print_data_lowess_and_kalman(data)
