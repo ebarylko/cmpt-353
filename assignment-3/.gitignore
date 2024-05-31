@@ -1,2 +1,6 @@
 .venv/
 __pycache__/
+check.txt
+out.gpx
+cpu.svg
+data.png

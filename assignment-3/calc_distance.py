@@ -113,11 +113,11 @@ def apply_kalman_filter(df: pd.DataFrame) -> pd.DataFrame:
                   [0, 1, -49 * m.pow(10, -7), 9 * m.pow(10, -7)],
                   [0, 0, 1, 0],
                   [0, 0, 0, 1]]
-    filter = KalmanFilter(initial_state_mean=initial_state,
+    kal_filter = KalmanFilter(initial_state_mean=initial_state,
                           transition_matrices=transition,
                           transition_covariance=transition_covariance,
                           observation_covariance=observation_covariance)
-    cleaned_data, _ = filter.smooth(df)
+    cleaned_data, _ = kal_filter.smooth(df)
     return pd.DataFrame(cleaned_data, columns=["lat", "lon", "Bx", "By"])
 
 
@@ -148,8 +148,8 @@ if not os.getenv("TESTING"):
     compass_readings = read_compass_readings(sys.argv[2])
     lat_and_long_readings = get_lat_lon_and_date(sys.argv[1])
     merged_readings = combine_lat_lon_and_date_and_compass_readings(lat_and_long_readings, compass_readings)
-    cleaned_data = apply_kalman_filter(merged_readings)
+    filtered_data = apply_kalman_filter(merged_readings)
 
     print(f'Unfiltered distance: {distance(merged_readings):.2f}')
-    print(f'Filtered distance: {distance(cleaned_data):.2f}')
-    output_gpx(cleaned_data, "out.gpx")
+    print(f'Filtered distance: {distance(filtered_data):.2f}')
+    output_gpx(filtered_data, "out.gpx")

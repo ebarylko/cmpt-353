@@ -30,7 +30,7 @@ def plot_kalman_filtering(df: pd.DataFrame):
     plt.plot(df['timestamp'], kf_smoothed[:, 0], 'g-')
 
 
-def plot_date_against_temperature(df: pd.DataFrame):
+def plot_date_against_temperature(dates, temperatures):
     """
      @param df: a DataFrame with information about the temperature, cpu usage, load on the system, the fan rotations
      per minute, and the date the observation was taken
@@ -38,28 +38,29 @@ def plot_date_against_temperature(df: pd.DataFrame):
     """
     plt.figure(figsize=(12, 4))
     plt.xticks(rotation=25)
-    temperatures = df['temperature']
-    dates = df['timestamp']
     plt.plot(dates, temperatures, 'b.', alpha=0.5)
 
 
-def plot_lowess_filtered_data(df: pd.DataFrame):
+def plot_lowess_filtered_data(dates, temperatures):
     """
-     @param df: a DataFrame with information about the temperature, cpu usage, load on the system, the fan rotations
-     per minute, and the date the observation was taken
+    @param dates: a Series of datetime
+    @param temperatures: a Series of temperatures
      @return: plots the temperature against the date of the observation after applying the LOWESS filter on the
      temperature
     """
-    temperatures = df['temperature']
-    dates = df['timestamp']
     smoothed_data = lowess(temperatures, dates, frac=0.06)[:, 1]
     plt.plot(dates, smoothed_data, 'r-')
 
 
-if not os.getenv("TESTING"):
-    data = pd.read_csv(sys.argv[1], header=0, parse_dates=[0])
-    plot_date_against_temperature(data)
-    plot_lowess_filtered_data(data)
+def plot_date_against_temperature_using_filters(data):
+    dates, temperatures = data['timestamp'], data['temperature']
+    plot_date_against_temperature(dates, temperatures)
+    plot_lowess_filtered_data(dates, temperatures)
     plot_kalman_filtering(data)
     plt.legend(['Measurements', 'Lowess', 'Kalman'])
     plt.savefig('cpu.svg')
+
+
+if not os.getenv("TESTING"):
+    data = pd.read_csv(sys.argv[1], header=0, parse_dates=[0])
+    plot_date_against_temperature_using_filters(data)
