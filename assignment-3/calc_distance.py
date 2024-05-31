@@ -10,14 +10,12 @@ import math as m
 import matplotlib.pyplot as plt
 from pykalman import KalmanFilter
 
-ns = "{http://www.topografix.com/GPX/1/0}"
-
 
 def get_lat_lon_and_date(file_name: str) -> pd.DataFrame:
     """
     @param file_name: the name of a xml file containing a collection of observations where each one has a
      latitude, longitude, and the date
-    @return: returns a latitude, longitude, and date of each observation as different rows within a
+    @return: returns the latitude, longitude, and date of each observation as different columns within a
     DataFrame
     """
 
@@ -70,9 +68,10 @@ def add_distance(curr_distance, consec_locations):
 
     fst_lat_in_rad = m.radians(fst_lat)
     snd_lat_in_rad = m.radians(snd_lat)
-    tmp = m.sqrt(m.sin(
-        diff_between(snd_lat, fst_lat) ** 2 +
-                       m.cos(fst_lat_in_rad) * m.cos(snd_lat_in_rad) * (m.sin(diff_between(snd_lon, fst_lon)) ** 2)))
+    tmp = m.sqrt(
+        m.sin(diff_between(snd_lat, fst_lat)) ** 2 +
+        m.cos(fst_lat_in_rad) * m.cos(snd_lat_in_rad) * (m.sin(diff_between(snd_lon, fst_lon)) ** 2)
+    )
 
     dst_from_a_to_b = 2 * earth_radius_in_meters * m.asin(tmp)
     return curr_distance + dst_from_a_to_b
@@ -114,9 +113,9 @@ def apply_kalman_filter(df: pd.DataFrame) -> pd.DataFrame:
                   [0, 0, 1, 0],
                   [0, 0, 0, 1]]
     kal_filter = KalmanFilter(initial_state_mean=initial_state,
-                          transition_matrices=transition,
-                          transition_covariance=transition_covariance,
-                          observation_covariance=observation_covariance)
+                              transition_matrices=transition,
+                              transition_covariance=transition_covariance,
+                              observation_covariance=observation_covariance)
     cleaned_data, _ = kal_filter.smooth(df)
     return pd.DataFrame(cleaned_data, columns=["lat", "lon", "Bx", "By"])
 
