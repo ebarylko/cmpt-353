@@ -43,16 +43,16 @@ def read_compass_readings(file_name) -> pd.DataFrame:
 
 
 def combine_lat_lon_and_date_and_compass_readings(lat_lon_date: pd.DataFrame,
-                                                  compass_readings: pd.DataFrame) -> pd.DataFrame:
+                                                  readings: pd.DataFrame) -> pd.DataFrame:
     """
     @param lat_lon_date: a DataFrame containing the latitude, longitude, and date of an observation
     in each row
-    @param compass_readings: a DataFrame where each row is an observation containing the date, x-coordinate,
+    @param readings: a DataFrame where each row is an observation containing the date, x-coordinate,
     y-coordinate, z-coordinate, acceleration in the x, y, and z dimensions
     @return: a subset of the two DataFrames joined by the date, where each row contains the latitude,
      longitude, x-coordinate, y-coordinate, and date of an observation
     """
-    return compass_readings.merge(lat_lon_date, on="date")[["lat", "lon", "Bx", "By"]]
+    return readings.merge(lat_lon_date, on="date")[["lat", "lon", "Bx", "By"]]
 
 
 def add_distance(curr_distance, consec_locations):
