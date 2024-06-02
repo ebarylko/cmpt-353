@@ -1,6 +1,7 @@
 import pandas as pd
 import xml.etree.ElementTree as et
 import functools as ft
+from operator import methodcaller
 
 
 def get_lat_lon_and_date(file_name: str) -> pd.DataFrame:
@@ -61,13 +62,24 @@ def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame
     @return: the cross-correlation between the gFx values in phone_data and the x-axis acceleration values in
     accelerometer data
     """
-    # def add_offset(df: pd.DataFrame):
-    #     cpy = df.copy()
-    #     cpy['date'] = accelerometer_data['date'].min() + pd.to_timedelta(cpy['date'] + offset, unit='sec')
-    #     return cpy
+    def add_offset(df: pd.DataFrame):
+        cpy = df.copy()
+        cpy['date'] = accelerometer_data['date'].min() + pd.to_timedelta(cpy['date'] + offset, unit='sec')
+        return cpy
+
+    join_on_date = methodcaller("merge", accelerometer_data.set_index('date'), on="date")
+
+    def calc_cross_correlation(df):
+        """
+        @param df: a DataFrame with the x coordinates and the x-axis acceleration as columns
+        @return: the dot product of the x coordinates and the x-axis acceleration
+        """
+        return None if df.empty else df['x'].dot(df['gFx'])
+
     phone_cpy = phone_data.copy().rename(columns={"time": "date"})
-    phone_cpy['date'] = accelerometer_data['date'].min() + pd.to_timedelta(phone_cpy['date'] + offset, unit='sec')
-    averaged_data = averages_in_nearest_four_seconds(phone_cpy)
-    joined_observations = averaged_data.join(accelerometer_data.set_index('date'), on="date")
-    return (joined_observations['x'] * joined_observations['gFx']).sum()
+
+    return (phone_cpy.pipe(add_offset).
+            pipe(averages_in_nearest_four_seconds).
+            pipe(join_on_date).
+            pipe(calc_cross_correlation))
 

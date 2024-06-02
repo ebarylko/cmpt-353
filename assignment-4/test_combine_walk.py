@@ -31,8 +31,10 @@ sample_accelerometer_data = pd.DataFrame({"date": [pd.Timestamp(2018, 9, 9, 9, 5
                                           "x": [3]})
 
 
+
 def test_correlation_value():
     assert cb.correlation_value(sample_phone_data, sample_accelerometer_data, 0) == 18
+    assert not cb.correlation_value(sample_phone_data, sample_accelerometer_data, 5)
 
 
 sample_offsets = [-5, 0, 5]
