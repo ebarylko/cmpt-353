@@ -1,0 +1,10 @@
+1. I believe that the results obtained with the Kalman filter are more accurate compared to the
+values obtained after using LOESS smoothing. I noticed that the data obtained using LOESS smoothing
+implied that the temperatures in the majority of the hours had little fluctuation, while the data after
+applying the Kalman filter suggested that temperatures are steady in most hours over a larger range of
+temperatures.
+
+2. A higher acceleration in the x, y, and z dimensions suggests that the target will move farther
+compared to previous observations, implying that a larger impact to the longitude and latitude will be seen
+in the next observation. Similarly, a lower acceleration indicates that the target will move less in the following
+observations, hinting that the target's longitude and latitude will not change much.

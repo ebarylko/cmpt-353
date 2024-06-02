@@ -1,0 +1,12 @@
+<gpx xmlns="http://www.topografix.com/GPX/1/0">
+  <trk>
+    <trkseg>
+      <trkpt lat="1" lon="2">
+        <time>2022-02-14</time>
+      </trkpt>
+      <trkpt lat="3" lon="4">
+        <time>2020-03-04</time>
+      </trkpt>
+      </trkseg>
+  </trk>
+</gpx>
