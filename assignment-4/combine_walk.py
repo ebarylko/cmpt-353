@@ -1,5 +1,6 @@
 import pandas as pd
 import xml.etree.ElementTree as et
+import functools as ft
 
 
 def get_lat_lon_and_date(file_name: str) -> pd.DataFrame:
@@ -34,3 +35,31 @@ def averages_in_nearest_four_seconds(df: pd.DataFrame) -> pd.DataFrame:
     df_cpy = df.copy()
     df_cpy["date"] = df_cpy["date"].dt.round("4s")
     return df_cpy.groupby(["date"]).mean()
+
+
+def best_offset(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offsets):
+    """
+    @param phone_data: a DataFrame with rows containing the time (in terms of seconds from beginning),
+     x coordinate, y coordinate, and gFx
+    @param accelerometer_data: a DataFrame with rows containing the date and the acceleration in the x dimension
+    @param offsets: a collection of numbers representing how much to offset the time in phone_data by
+    @return: the offset corresponding with the highest cross-correlation between the gFx values in phone_data
+    and the x-axis acceleration values in accelerometer_data after applying the offset to the time in phone_data
+    """
+    correlation_and_offset = ft.partial(correlation_value, phone_data, accelerometer_data)
+    correlation_values_and_offsets = map(correlation_and_offset, offsets)
+    # phone_cpy = phone_data.copy()
+    # phone_cpy['timestamp'] = accelerometer_data["date"].min() + pd.to_timedelta(phone_cpy['time'] + offset, unit='sec')
+
+
+def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offset):
+    """
+    @param phone_data: a DataFrame with rows containing the time (in terms of seconds from beginning),
+     x coordinate, y coordinate, and gFx
+    @param accelerometer_data: a DataFrame with rows containing the date and the acceleration in the x dimension
+    @param offset: the amount of time to offset the time in phone_data by
+    @return: the cross-correlation between the gFx values in phone_data and the x-axis acceleration values in
+    accelerometer data
+    """
+    phone_cpy = phone_data.cpy().rename(columns={"time": "date"})
+    phone_cpy['date'] = accelerometer_data['date'].min() + pd.to_timedelta(phone_cpy['date'] + offset, unit='sec')
