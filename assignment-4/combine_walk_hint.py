@@ -45,17 +45,17 @@ def main():
     output_directory = pathlib.Path(sys.argv[2])
     
     accl = pd.read_json(input_directory / 'accl.ndjson.gz', lines=True, convert_dates=['timestamp'])[['timestamp', 'x']]
-    gps = get_data(input_directory / 'gopro.gpx')
+    # gps = get_data(input_directory / 'gopro.gpx')
     phone = pd.read_csv(input_directory / 'phone.csv.gz')[['time', 'gFx', 'Bx', 'By']]
 
     first_time = accl['timestamp'].min()
     
     # TODO: create "combined" as described in the exercise
     
-    print(f'Best time offset: {best_offset:.1f}')
-    os.makedirs(output_directory, exist_ok=True)
-    output_gpx(combined[['datetime', 'lat', 'lon']], output_directory / 'walk.gpx')
-    combined[['datetime', 'Bx', 'By']].to_csv(output_directory / 'walk.csv', index=False)
+    # print(f'Best time offset: {best_offset:.1f}')
+    # os.makedirs(output_directory, exist_ok=True)
+    # output_gpx(combined[['datetime', 'lat', 'lon']], output_directory / 'walk.gpx')
+    # combined[['datetime', 'Bx', 'By']].to_csv(output_directory / 'walk.csv', index=False)
 
 
 main()
