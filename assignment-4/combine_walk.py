@@ -61,5 +61,13 @@ def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame
     @return: the cross-correlation between the gFx values in phone_data and the x-axis acceleration values in
     accelerometer data
     """
-    phone_cpy = phone_data.cpy().rename(columns={"time": "date"})
+    # def add_offset(df: pd.DataFrame):
+    #     cpy = df.copy()
+    #     cpy['date'] = accelerometer_data['date'].min() + pd.to_timedelta(cpy['date'] + offset, unit='sec')
+    #     return cpy
+    phone_cpy = phone_data.copy().rename(columns={"time": "date"})
     phone_cpy['date'] = accelerometer_data['date'].min() + pd.to_timedelta(phone_cpy['date'] + offset, unit='sec')
+    averaged_data = averages_in_nearest_four_seconds(phone_cpy)
+    joined_observations = averaged_data.join(accelerometer_data.set_index('date'), on="date")
+    return (joined_observations['x'] * joined_observations['gFx']).sum()
+
