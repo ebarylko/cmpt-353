@@ -1,7 +1,11 @@
 import pandas as pd
+import numpy as np
 import xml.etree.ElementTree as et
 import functools as ft
 from operator import methodcaller
+import os
+import pathlib
+import sys
 
 
 def get_lat_lon_and_date(file_name: str) -> pd.DataFrame:
@@ -60,33 +64,6 @@ def thread_last(val, *forms):
     return ft.reduce(evalform_back, forms, val)
 
 
-def best_offset(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offsets):
-    """
-    @param phone_data: a DataFrame with rows containing the time (in terms of seconds from beginning),
-     x coordinate, y coordinate, and gFx
-    @param accelerometer_data: a DataFrame with rows containing the date and the acceleration in the x dimension
-    @param offsets: a collection of numbers representing how much to offset the time in phone_data by
-    @return: the offset corresponding with the highest cross-correlation between the gFx values in phone_data
-    and the x-axis acceleration values in accelerometer_data after applying the offset to the time in phone_data
-    """
-    def sort_by_correlation_value(coll):
-        return sorted(coll, key=lambda c: c[0])
-
-    def is_valid_correlation_value(coll):
-        return coll[1]
-
-    def ffirst(coll):
-        return coll[0][0]
-
-    correlation_values = ft.partial(correlation_value, phone_data, accelerometer_data)
-    return thread_last(
-        map(correlation_values, offsets),
-        (zip, offsets),
-        (filter, is_valid_correlation_value),
-        sort_by_correlation_value,
-        ffirst)
-
-
 def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offset):
     """
     @param phone_data: a DataFrame with rows containing the time (in terms of seconds from beginning),
@@ -110,10 +87,90 @@ def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame
         """
         return None if df.empty else df['x'].dot(df['gFx'])
 
-    phone_cpy = phone_data.copy().rename(columns={"time": "date"})
+    phone_cpy = phone_data.copy()
+    print(phone_cpy)
 
     return (phone_cpy.pipe(add_offset).
             pipe(averages_in_nearest_four_seconds).
             pipe(join_on_date).
             pipe(calc_cross_correlation))
 
+
+def best_offset(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offsets):
+    """
+    @param phone_data: a DataFrame with rows containing the time (in terms of seconds from beginning),
+     x coordinate, y coordinate, and gFx
+    @param accelerometer_data: a DataFrame with rows containing the date and the acceleration in the x dimension
+    @param offsets: a collection of numbers representing how much to offset the time in phone_data by
+    @return: the offset corresponding with the highest cross-correlation between the gFx values in phone_data
+    and the x-axis acceleration values in accelerometer_data after applying the offset to the time in phone_data
+    """
+    def sort_by_correlation_value(coll):
+        return sorted(coll, key=lambda c: c[0])
+
+    def is_valid_correlation_value(coll):
+        return coll[1]
+
+    def ffirst(coll):
+        return None if not coll else coll[0][0]
+
+    correlation_values = ft.partial(correlation_value, phone_data, accelerometer_data)
+    return thread_last(
+        map(correlation_values, offsets),
+        (zip, offsets),
+        (filter, is_valid_correlation_value),
+        sort_by_correlation_value,
+        ffirst)
+
+
+def output_gpx(points, output_filename):
+    """
+    Output a GPX file with latitude and longitude from the points DataFrame.
+    """
+    from xml.dom.minidom import getDOMImplementation, parse
+    xmlns = 'http://www.topografix.com/GPX/1/0'
+
+    def append_trkpt(pt, trkseg, doc):
+        trkpt = doc.createElement('trkpt')
+        trkpt.setAttribute('lat', '%.10f' % (pt['lat']))
+        trkpt.setAttribute('lon', '%.10f' % (pt['lon']))
+        time = doc.createElement('time')
+        time.appendChild(doc.createTextNode(pt['datetime'].strftime("%Y-%m-%dT%H:%M:%SZ")))
+        trkpt.appendChild(time)
+        trkseg.appendChild(trkpt)
+
+    doc = getDOMImplementation().createDocument(None, 'gpx', None)
+    trk = doc.createElement('trk')
+    doc.documentElement.appendChild(trk)
+    trkseg = doc.createElement('trkseg')
+    trk.appendChild(trkseg)
+
+    points.apply(append_trkpt, axis=1, trkseg=trkseg, doc=doc)
+
+    doc.documentElement.setAttribute('xmlns', xmlns)
+
+    with open(output_filename, 'w') as fh:
+        fh.write(doc.toprettyxml(indent='  '))
+
+
+def main():
+    input_directory = pathlib.Path(sys.argv[1])
+    output_directory = pathlib.Path(sys.argv[2])
+
+    accl = (pd.read_json(input_directory / 'accl.ndjson.gz', lines=True, convert_dates=['timestamp'])[['timestamp', 'x']].
+            rename(columns={"timestamp": "date"}))
+    gps = get_lat_lon_and_date(str(input_directory / 'gopro.gpx'))
+    phone = pd.read_csv(input_directory / 'phone.csv.gz')[['time', 'gFx', 'Bx', 'By']].rename(columns={"time": "date"})
+
+    # first_time = accl['timestamp'].min()
+    cleaned_data = averages_in_nearest_four_seconds(accl)
+    print(phone)
+
+    print(f'Best time offset: {best_offset(phone, cleaned_data, np.linspace(-5.0, 5.0, 101)):.1f}')
+    # os.makedirs(output_directory, exist_ok=True)
+    # output_gpx(combined[['datetime', 'lat', 'lon']], output_directory / 'walk.gpx')
+    # combined[['datetime', 'Bx', 'By']].to_csv(output_directory / 'walk.csv', index=False)
+
+
+if not os.getenv('TESTING'):
+    main()
