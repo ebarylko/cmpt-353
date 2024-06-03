@@ -38,6 +38,28 @@ def averages_in_nearest_four_seconds(df: pd.DataFrame) -> pd.DataFrame:
     return df_cpy.groupby(["date"]).mean()
 
 
+
+def thread_last(val, *forms):
+    """
+    Thread value through a sequence of functions/forms
+    If the function expects more than one input you can specify those inputs
+    in a tuple.  The value is used as the last input.
+
+    So in general
+        thread_last(x, f, (g, y, z))
+    expands to
+        g(y, z, f(x))
+    """
+    def evalform_back(val, form):
+        if callable(form):
+            return form(val)
+        if isinstance(form, tuple):
+            func, args = form[0], form[1:]
+            args = args + (val,)
+            return func(*args)
+    return ft.reduce(evalform_back, forms, val)
+
+
 def best_offset(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offsets):
     """
     @param phone_data: a DataFrame with rows containing the time (in terms of seconds from beginning),
@@ -47,10 +69,22 @@ def best_offset(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offs
     @return: the offset corresponding with the highest cross-correlation between the gFx values in phone_data
     and the x-axis acceleration values in accelerometer_data after applying the offset to the time in phone_data
     """
-    correlation_and_offset = ft.partial(correlation_value, phone_data, accelerometer_data)
-    correlation_values_and_offsets = map(correlation_and_offset, offsets)
-    # phone_cpy = phone_data.copy()
-    # phone_cpy['timestamp'] = accelerometer_data["date"].min() + pd.to_timedelta(phone_cpy['time'] + offset, unit='sec')
+    def sort_by_correlation_value(coll):
+        return sorted(coll, key=lambda c: c[0])
+
+    def is_valid_correlation_value(coll):
+        return coll[1]
+
+    def ffirst(coll):
+        return coll[0][0]
+
+    correlation_values = ft.partial(correlation_value, phone_data, accelerometer_data)
+    return thread_last(
+        map(correlation_values, offsets),
+        (zip, offsets),
+        (filter, is_valid_correlation_value),
+        sort_by_correlation_value,
+        ffirst)
 
 
 def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offset):
