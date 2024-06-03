@@ -64,6 +64,18 @@ def thread_last(val, *forms):
     return ft.reduce(evalform_back, forms, val)
 
 
+def add_offset(df, min_date, offset):
+    """
+    @param df: a DataFrame with columns x-coordinate, y-coordinate, and time (in seconds)
+    @param min_date: the lowest date an observation can be taken on
+    @param offset: the amount of time in seconds to offset the min_date by
+    @return: Adds the min_date and offset to all the times in the original DataFrame
+    """
+    cpy = df.copy()
+    cpy['date'] = min_date + pd.to_timedelta(cpy['date'] + offset, unit='sec')
+    return cpy
+
+
 def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offset):
     """
     @param phone_data: a DataFrame with rows containing the time (in terms of seconds from beginning),
@@ -73,11 +85,6 @@ def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame
     @return: the cross-correlation between the gFx values in phone_data and the x-axis acceleration values in
     accelerometer data
     """
-    def add_offset(df: pd.DataFrame):
-        cpy = df.copy()
-        cpy['date'] = accelerometer_data.reset_index()['date'].min() + pd.to_timedelta(cpy['date'] + offset, unit='sec')
-        return cpy
-
     join_on_date = methodcaller("merge", accelerometer_data, on="date")
 
     def calc_cross_correlation(df):
@@ -88,8 +95,9 @@ def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame
         return None if df.empty else df['x'].dot(df['gFx'])
 
     phone_cpy = phone_data.copy()
+    fst_date = accelerometer_data.reset_index()['date'].min()
 
-    return (phone_cpy.pipe(add_offset)
+    return (phone_cpy.pipe(add_offset, fst_date, offset)
             .pipe(averages_in_nearest_four_seconds)
             .pipe(join_on_date)
             .pipe(calc_cross_correlation)
@@ -154,6 +162,18 @@ def output_gpx(points, output_filename):
         fh.write(doc.toprettyxml(indent='  '))
 
 
+def merge_readings(phone_data, acceleration, gps_data):
+    return (phone_data.merge(acceleration, on='date').merge(gps_data, on='date')
+            .reset_index()
+            .rename(columns={"date": "datetime"}))
+
+
+def output_results(readings, output_directory):
+    os.makedirs(output_directory, exist_ok=True)
+    output_gpx(readings[['datetime', 'lat', 'lon']], output_directory / 'walk.gpx')
+    readings[['datetime', 'Bx', 'By']].to_csv(output_directory / 'walk.csv', index=False)
+
+
 def main():
     input_directory = pathlib.Path(sys.argv[1])
     output_directory = pathlib.Path(sys.argv[2])
@@ -163,14 +183,16 @@ def main():
     gps = get_lat_lon_and_date(str(input_directory / 'gopro.gpx'))
     phone = pd.read_csv(input_directory / 'phone.csv.gz')[['time', 'gFx', 'Bx', 'By']].rename(columns={"time": "date"})
 
-    # first_time = accl['timestamp'].min()
-    cleaned_data = averages_in_nearest_four_seconds(accl)
+    cleaned_acceleration = averages_in_nearest_four_seconds(accl)
 
-    print(best_offset(phone, cleaned_data, np.linspace(-5.0, 5.0, 101)))
-    # print(f'Best time offset: {best_offset(phone, cleaned_data, np.linspace(-5.0, 5.0, 101)):.1f}')
-    # os.makedirs(output_directory, exist_ok=True)
-    # output_gpx(combined[['datetime', 'lat', 'lon']], output_directory / 'walk.gpx')
-    # combined[['datetime', 'Bx', 'By']].to_csv(output_directory / 'walk.csv', index=False)
+    bst_offset = best_offset(phone, cleaned_acceleration, np.linspace(-5.0, 5.0, 101))
+    start_date = cleaned_acceleration.reset_index()['date'].min()
+    cleaned_phone_data = phone.pipe(add_offset, start_date, bst_offset).pipe(averages_in_nearest_four_seconds)
+    cleaned_gps_data = averages_in_nearest_four_seconds(gps)
+    all_readings = merge_readings(cleaned_phone_data, cleaned_acceleration, cleaned_gps_data)
+
+    output_results(all_readings, output_directory)
+    print(f'Best time offset: {bst_offset:.1f}')
 
 
 if not os.getenv('TESTING'):

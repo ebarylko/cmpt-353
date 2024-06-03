@@ -42,3 +42,4 @@ sample_offsets = [-5, 0, 5]
 def test_best_offset():
     assert cb.best_offset(sample_phone_data, sample_accelerometer_data, sample_offsets) == 0
     assert not cb.best_offset(sample_phone_data, sample_accelerometer_data, [5, -5])
+
