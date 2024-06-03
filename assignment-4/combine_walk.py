@@ -75,10 +75,10 @@ def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame
     """
     def add_offset(df: pd.DataFrame):
         cpy = df.copy()
-        cpy['date'] = accelerometer_data['date'].min() + pd.to_timedelta(cpy['date'] + offset, unit='sec')
+        cpy['date'] = accelerometer_data.reset_index()['date'].min() + pd.to_timedelta(cpy['date'] + offset, unit='sec')
         return cpy
 
-    join_on_date = methodcaller("merge", accelerometer_data.set_index('date'), on="date")
+    join_on_date = methodcaller("merge", accelerometer_data, on="date")
 
     def calc_cross_correlation(df):
         """
@@ -88,12 +88,12 @@ def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame
         return None if df.empty else df['x'].dot(df['gFx'])
 
     phone_cpy = phone_data.copy()
-    print(phone_cpy)
 
-    return (phone_cpy.pipe(add_offset).
-            pipe(averages_in_nearest_four_seconds).
-            pipe(join_on_date).
-            pipe(calc_cross_correlation))
+    return (phone_cpy.pipe(add_offset)
+            .pipe(averages_in_nearest_four_seconds)
+            .pipe(join_on_date)
+            .pipe(calc_cross_correlation)
+            )
 
 
 def best_offset(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offsets):
@@ -120,7 +120,8 @@ def best_offset(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offs
         (zip, offsets),
         (filter, is_valid_correlation_value),
         sort_by_correlation_value,
-        ffirst)
+        ffirst
+    )
 
 
 def output_gpx(points, output_filename):
@@ -164,9 +165,9 @@ def main():
 
     # first_time = accl['timestamp'].min()
     cleaned_data = averages_in_nearest_four_seconds(accl)
-    print(phone)
 
-    print(f'Best time offset: {best_offset(phone, cleaned_data, np.linspace(-5.0, 5.0, 101)):.1f}')
+    print(best_offset(phone, cleaned_data, np.linspace(-5.0, 5.0, 101)))
+    # print(f'Best time offset: {best_offset(phone, cleaned_data, np.linspace(-5.0, 5.0, 101)):.1f}')
     # os.makedirs(output_directory, exist_ok=True)
     # output_gpx(combined[['datetime', 'lat', 'lon']], output_directory / 'walk.gpx')
     # combined[['datetime', 'Bx', 'By']].to_csv(output_directory / 'walk.csv', index=False)
