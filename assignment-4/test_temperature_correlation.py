@@ -43,8 +43,16 @@ expected_station = pd.DataFrame({"observations": [1],
                                  "elevation": [1]})
 
 
+sample_station = pd.Series({"observations": 1,
+                            "avg_tmax": 1,
+                            "station": "a1",
+                            "latitude": 0,
+                            "longitude": 0,
+                            "elevation": 1})
+
 def test_distance():
-    assert round(tc.distance([1, 1], [0, 0])) == 157249
+    assert round(tc.distance([1, 1], sample_station)) == 157249
+
 
 def test_closest_station():
     pdt.assert_frame_equal(tc.closest_station(sample_city, sample_stations), expected_station)

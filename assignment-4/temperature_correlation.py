@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import math as m
+import functools as ft
 
 
 def read_weather_station_data(file_name):
@@ -28,10 +29,10 @@ def remove_invalid_cities(cities: pd.DataFrame) -> pd.DataFrame:
     return cities.dropna().query("area < 10000")
 
 
-def distance(fst_loc, snd_loc):
+def distance(fst_loc, snd_loc: pd.Series):
     """
     @param fst_loc: a collection containing a latitude and longitude
-    @param snd_loc: a collection containing a latitude and longitude
+    @param snd_loc: a series containing a latitude and longitude for a location
     @return: the distance between fst_loc and snd_loc
     """
     def diff_between(x, y):
@@ -42,7 +43,7 @@ def distance(fst_loc, snd_loc):
 
     earth_radius_in_meters = 6371000
     fst_lat, fst_lon = fst_loc
-    snd_lat, snd_lon = snd_loc
+    snd_lat, snd_lon = snd_loc.latitude, snd_loc.longitude
 
     fst_lat_in_rad = m.radians(fst_lat)
     snd_lat_in_rad = m.radians(snd_lat)
@@ -61,4 +62,5 @@ def closest_station(city: pd.Series, stations: pd.DataFrame) -> pd.Series:
     temperature readings, and total number of observations
     @return: the first station closest to the city
     """
-    # return stations.assign(distance=)
+    calc_distance = ft.partial(distance, [city.latitude, city.longitude])
+    with_distance = stations.assign(distance=stations.apply(calc_distance, axis=1))
