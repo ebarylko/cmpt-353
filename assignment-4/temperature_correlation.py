@@ -29,10 +29,10 @@ def remove_invalid_cities(cities: pd.DataFrame) -> pd.DataFrame:
     return cities.dropna().query("area < 10000")
 
 
-def distance(fst_loc, snd_loc: pd.Series):
+def distance(fst_loc, snd_loc):
     """
     @param fst_loc: a collection containing a latitude and longitude
-    @param snd_loc: a series containing a latitude and longitude for a location
+    @param snd_loc: a collection containing a latitude and longitude for a location
     @return: the distance between fst_loc and snd_loc
     """
     def diff_between(x, y):
@@ -43,7 +43,7 @@ def distance(fst_loc, snd_loc: pd.Series):
 
     earth_radius_in_meters = 6371000
     fst_lat, fst_lon = fst_loc
-    snd_lat, snd_lon = snd_loc.latitude, snd_loc.longitude
+    snd_lat, snd_lon = snd_loc
 
     fst_lat_in_rad = m.radians(fst_lat)
     snd_lat_in_rad = m.radians(snd_lat)
@@ -63,4 +63,8 @@ def closest_station(city: pd.Series, stations: pd.DataFrame) -> pd.Series:
     @return: the first station closest to the city
     """
     calc_distance = ft.partial(distance, [city.latitude, city.longitude])
-    with_distance = stations.assign(distance=stations.apply(calc_distance, axis=1))
+    latitude = stations['latitude']
+    longitude = stations['longitude']
+    lat_and_lon = latitude.combine(longitude, lambda x, y: [x, y])
+    row_of_closest_city = lat_and_lon.apply(calc_distance).idxmin()
+    return stations.iloc[row_of_closest_city]
