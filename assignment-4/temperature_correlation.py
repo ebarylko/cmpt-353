@@ -55,16 +55,33 @@ def distance(fst_loc, snd_loc):
     return dst_from_a_to_b
 
 
-def closest_station(city: pd.Series, stations: pd.DataFrame) -> pd.Series:
+def closest_station(stations: pd.DataFrame, city: pd.Series) -> pd.Series:
     """
     @param city: a Series containing the name of the city, longitude, latitude, and other information
     @param stations: a DataFrame where the rows contain the name of the station, longitude, latitude, elevation, average
     temperature readings, and total number of observations
     @return: the first station closest to the city
     """
+    def join_lat_and_lon(df: pd.DataFrame) -> pd.Series:
+        latitude = df['latitude']
+        longitude = df['longitude']
+        return latitude.combine(longitude, lambda x, y: [x, y])
+
     calc_distance = ft.partial(distance, [city.latitude, city.longitude])
-    latitude = stations['latitude']
-    longitude = stations['longitude']
-    lat_and_lon = latitude.combine(longitude, lambda x, y: [x, y])
+    lat_and_lon = join_lat_and_lon(stations)
     row_of_closest_city = lat_and_lon.apply(calc_distance).idxmin()
     return stations.iloc[row_of_closest_city]
+
+
+def avg_temperatures(stations: pd.DataFrame, cities: pd.DataFrame):
+    """
+    @param stations: a DataFrame where each row contains the position in longitude and
+    latitude of a weather station, the average temperature readings, the total
+    number of observations, and the id of the weather station
+    @param cities: a DataFrame where each row contains the name of a city,
+    position in latitude and longitude, and population density
+    @return: the average temperature associated to the closest weather
+    station for each city
+    """
+    calc_avg_tmp = ft.partial(closest_station, stations)
+    return cities.apply(calc_avg_tmp, axis=1)['avg_tmax']
