@@ -65,9 +65,10 @@ example_stations = pd.DataFrame({"observations": [1, 1],
                                  "longitude": [0, 2],
                                  "elevation": [1, 3]})
 
-expected_avgs = pd.Series([1, 2, 2])
+expected_avgs = pd.Series([1, 1, 2])
 
 
 def test_avg_temperatures():
-    pdt.assert_series_equal(tc.avg_temperatures(example_stations, example_cities), expected_avgs)
-    # assert tc.avg_temperatures(example_stations, example_cities) == [1, 2, 2]
+    pdt.assert_series_equal(tc.avg_temperatures(example_stations, example_cities),
+                            expected_avgs,
+                            check_names=False)

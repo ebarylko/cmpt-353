@@ -12,12 +12,24 @@ def read_weather_station_data(file_name):
     """
     return pd.read_json(file_name, lines=True)
 
+
 def read_city_data(file_name):
     """
     @param file_name: the name of the file containing information about cities
     @return: a DataFrame containing the information present in file_name
     """
-    return pd.read_csv(file_name, header=0)
+    def convert_to_km_squared(df: pd.DataFrame):
+        cpy = df.copy()
+        cpy['area'] = cpy['area'] / 1000000
+        return cpy
+
+    def add_population_density(df: pd.DataFrame):
+        cpy = df.copy()
+        cpy['population_density'] = cpy['population'] / cpy['area']
+        return cpy
+
+    city_info = pd.read_csv(file_name, header=0)
+    return city_info.pipe(convert_to_km_squared).pipe(add_population_density)
 
 
 def remove_invalid_cities(cities: pd.DataFrame) -> pd.DataFrame:
@@ -85,3 +97,9 @@ def avg_temperatures(stations: pd.DataFrame, cities: pd.DataFrame):
     """
     calc_avg_tmp = ft.partial(closest_station, stations)
     return cities.apply(calc_avg_tmp, axis=1)['avg_tmax']
+
+
+if not os.getenv("TESTING"):
+    station_data = read_weather_station_data(sys.argv[1])
+    city_data = read_city_data(sys.argv[2]).pipe(remove_invalid_cities)
+    valid_city_data = remove_invalid_cities(city_data)
