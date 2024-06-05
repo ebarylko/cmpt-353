@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 import math as m
 import functools as ft
+import matplotlib.pyplot as plt
 
 
 def read_weather_station_data(file_name):
@@ -10,7 +11,9 @@ def read_weather_station_data(file_name):
     @param file_name: the name of the file containing weather data
     @return: a DataFrame containing the information present in file_name
     """
-    return pd.read_json(file_name, lines=True)
+    weather_data = pd.read_json(file_name, lines=True)
+    weather_data['avg_tmax'] = weather_data['avg_tmax'] / 10
+    return weather_data
 
 
 def read_city_data(file_name):
@@ -99,7 +102,31 @@ def avg_temperatures(stations: pd.DataFrame, cities: pd.DataFrame):
     return cities.apply(calc_avg_tmp, axis=1)['avg_tmax']
 
 
+def plot_population_density_against_temperature(pop_density: pd.Series, average_temperatures: pd.Series, name):
+    """
+    @param pop_density: a Series containing  population density values,
+    each representing a different city
+    @param average_temperatures: a Series containing average temperature readings,
+    each for a different city
+    @param name: the name of the file which will contain the graph
+    @return: plots a graph comparing the population density of a city against its
+    average temperature
+    """
+    plt.figure(figsize=(12, 4))
+    plt.xlabel("Avg Max Temperature (\u00b0C)")
+    plt.ylabel("Population Density (people/km\u00b2)")
+    plt.title("Temperature vs Population Density")
+    plt.plot(average_temperatures, pop_density, 'b.')
+    plt.savefig(name)
+
+
 if not os.getenv("TESTING"):
     station_data = read_weather_station_data(sys.argv[1])
     city_data = read_city_data(sys.argv[2]).pipe(remove_invalid_cities)
     valid_city_data = remove_invalid_cities(city_data)
+
+    avgs_for_all_cities = avg_temperatures(station_data, valid_city_data)
+    file_name = sys.argv[3]
+    plot_population_density_against_temperature(valid_city_data['population_density'],
+                                                avgs_for_all_cities,
+                                                file_name)
