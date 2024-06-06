@@ -22,11 +22,7 @@ def test_remove_invalid_cities():
                            check_dtype=False)
 
 
-sample_city = pd.Series({"name": "a",
-                         "population": 1,
-                         "area": 1,
-                         "latitude": 1,
-                         "longitude": 1})
+sample_city = pd.Series([1, 1])
 
 sample_stations = pd.DataFrame({"observations": [1, 1, 1],
                                 "avg_tmax": [1, 2, 3],
@@ -43,13 +39,13 @@ expected_station = pd.Series({"observations": 1,
                               "elevation": 1})
 
 
-def test_distance():
-    assert round(tc.distance([1, 1], [0, 0])) == 157249
-
-
 def test_closest_station():
     pdt.assert_series_equal(tc.closest_station(sample_stations, sample_city), expected_station,
                             check_names=False)
+
+def test_distance():
+    assert round(tc.distance([1, 1], [0, 0])) == 157249
+
 
 
 example_cities = pd.DataFrame({"name": ["a", "b", "c"],

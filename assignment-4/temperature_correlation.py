@@ -21,6 +21,7 @@ def read_city_data(file_name):
     @param file_name: the name of the file containing information about cities
     @return: a DataFrame containing the information present in file_name
     """
+
     def convert_to_km_squared(df: pd.DataFrame):
         cpy = df.copy()
         cpy['area'] = cpy['area'] / 1000000
@@ -50,6 +51,7 @@ def distance(fst_loc, snd_loc):
     @param snd_loc: a collection containing a latitude and longitude for a location
     @return: the distance between fst_loc and snd_loc
     """
+
     def diff_between(x, y):
         return m.radians(x - y) / 2
 
@@ -70,6 +72,16 @@ def distance(fst_loc, snd_loc):
     return dst_from_a_to_b
 
 
+def join_lat_and_lon(df: pd.DataFrame) -> pd.Series:
+    """
+    @param df: a DataFrame containing longitude and latitude as its columns with additional information
+    @return: a Series containing the latitude and longitude of the DataFrame
+    """
+    latitude = df['latitude']
+    longitude = df['longitude']
+    return latitude.combine(longitude, lambda x, y: [x, y])
+
+
 def closest_station(stations: pd.DataFrame, city: pd.Series) -> pd.Series:
     """
     @param city: a Series containing the name of the city, longitude, latitude, and other information
@@ -77,12 +89,8 @@ def closest_station(stations: pd.DataFrame, city: pd.Series) -> pd.Series:
     temperature readings, and total number of observations
     @return: the first station closest to the city
     """
-    def join_lat_and_lon(df: pd.DataFrame) -> pd.Series:
-        latitude = df['latitude']
-        longitude = df['longitude']
-        return latitude.combine(longitude, lambda x, y: [x, y])
 
-    calc_distance = ft.partial(distance, [city.latitude, city.longitude])
+    calc_distance = ft.partial(distance, [city[0], city[1]])
     lat_and_lon = join_lat_and_lon(stations)
     row_of_closest_city = lat_and_lon.apply(calc_distance).idxmin()
     return stations.iloc[row_of_closest_city]
@@ -99,7 +107,9 @@ def avg_temperatures(stations: pd.DataFrame, cities: pd.DataFrame):
     station for each city
     """
     calc_avg_tmp = ft.partial(closest_station, stations)
-    return cities.apply(calc_avg_tmp, axis=1)['avg_tmax']
+    lat_and_lon = join_lat_and_lon(cities)
+    return lat_and_lon.apply(calc_avg_tmp)['avg_tmax']
+    # return cities.apply(calc_avg_tmp, axis=1)['avg_tmax']
 
 
 def plot_population_density_against_temperature(pop_density: pd.Series, average_temperatures: pd.Series, name):
