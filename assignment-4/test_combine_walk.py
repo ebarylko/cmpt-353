@@ -22,10 +22,10 @@ def test_averages_in_nearest_four_seconds():
                            check_like=True)
 
 
-sample_phone_data = pd.DataFrame({"date": [0.3, 0.6],
-                                  "gFx": [9, 3],
-                                  "Bx": [1, 9],
-                                  "By": [1, 6]})
+sample_phone_data = pd.DataFrame({"date": [0.3, 0.6, 3],
+                                  "gFx": [9, 3, 4],
+                                  "Bx": [1, 9, 2],
+                                  "By": [1, 6, 2]})
 
 sample_accelerometer_data = pd.DataFrame({"date": [pd.Timestamp(2018, 9, 9, 9, 52, 28)],
                                           "x": [3]})
@@ -36,7 +36,7 @@ def test_correlation_value():
     assert not cb.correlation_value(sample_phone_data, sample_accelerometer_data, 5)
 
 
-sample_offsets = [-5, 0, 5]
+sample_offsets = [-5, 0, -3]
 
 
 def test_best_offset():

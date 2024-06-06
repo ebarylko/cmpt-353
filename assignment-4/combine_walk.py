@@ -33,9 +33,9 @@ def get_lat_lon_and_date(file_name: str) -> pd.DataFrame:
 
 def averages_in_nearest_four_seconds(df: pd.DataFrame) -> pd.DataFrame:
     """
-    @param df: a DataFrame with rows containing the time, and other data
-    @return: groups the rows to the nearest four seconds and takes the averages of the other data in the groups. Returns
-    a DataFrame containing the averages of the grouped rows
+    @param df: a DataFrame with rows containing the time, x position, y position, and other data
+    @return: groups the rows to the nearest four seconds and takes the averages of all the data in
+    the groups. Returns a DataFrame containing the averages of the grouped rows
     """
     df_cpy = df.copy()
     df_cpy["date"] = df_cpy["date"].dt.round("4s")
@@ -66,8 +66,8 @@ def thread_last(val, *forms):
 
 def add_offset(df, min_date, offset):
     """
-    @param df: a DataFrame with columns x-coordinate, y-coordinate, and time (in seconds)
-    @param min_date: the lowest date an observation can be taken on
+    @param df: a DataFrame with columns being x-coordinate, y-coordinate, and time (in seconds)
+    @param min_date: the date every observation starts at
     @param offset: the amount of time in seconds to offset the min_date by
     @return: Adds the min_date and offset to all the times in the original DataFrame
     """
@@ -78,12 +78,12 @@ def add_offset(df, min_date, offset):
 
 def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offset):
     """
-    @param phone_data: a DataFrame with rows containing the time (in terms of seconds from beginning),
-     x coordinate, y coordinate, and gFx
-    @param accelerometer_data: a DataFrame with rows containing the date and the acceleration in the x dimension
+    @param phone_data: a DataFrame with rows containing the time
+    (in terms of seconds from the beginning of the recording), x coordinates, y coordinates, and gFx
+    @param accelerometer_data: a DataFrame with rows containing the date and the x-direction acceleration
     @param offset: the amount of time to offset the time in phone_data by
     @return: the cross-correlation between the gFx values in phone_data and the x-axis acceleration values in
-    accelerometer data
+    accelerometer data after adding the offset to the times in phone_data
     """
     join_on_date = methodcaller("merge", accelerometer_data, on="date")
 
@@ -106,15 +106,15 @@ def correlation_value(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame
 
 def best_offset(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offsets):
     """
-    @param phone_data: a DataFrame with rows containing the time (in terms of seconds from beginning),
-     x coordinate, y coordinate, and gFx
+    @param phone_data: a DataFrame with rows containing the time (in terms of seconds from beginning the recording),
+     an x coordinate, a y coordinate, and a gFx reading
     @param accelerometer_data: a DataFrame with rows containing the date and the acceleration in the x dimension
     @param offsets: a collection of numbers representing how much to offset the time in phone_data by
     @return: the offset corresponding with the highest cross-correlation between the gFx values in phone_data
     and the x-axis acceleration values in accelerometer_data after applying the offset to the time in phone_data
     """
     def sort_by_correlation_value(coll):
-        return sorted(coll, key=lambda c: c[0])
+        return sorted(coll, key=lambda c: c[0], reverse=True)
 
     def is_valid_correlation_value(coll):
         return coll[1]
