@@ -1,0 +1,14 @@
+1. I do not believe that daily temperatures are a good measure for the population density of a city.
+Viewing the graph comparing the average daily temperature against the population density of a city,
+there is no apparent linear relationship between the two. Therefore, inferring the population
+density of a city from the average temperature may not give the most accurate result.
+
+2. By compressing and decompressing the data, we only use the data when we need and
+are not needlessly using space for storing the decompressed file. If we had multiple
+large datasets and they were all decompressed,
+
+By using the compressed files, we are able to store larger datasets in a more compact form,
+using less storage on a computer compared to its uncompressed form. By decompressing the
+data only when we need it, we are able to work with multiple large datasets in their
+compressed form using only a fraction of the storage required than if the data had been
+uncompressed.
