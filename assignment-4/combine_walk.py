@@ -28,9 +28,7 @@ def get_lat_lon_and_date(file_name: str) -> pd.DataFrame:
     observations = et.parse(file_name).getroot().iter('{http://www.topografix.com/GPX/1/0}trkpt')
     lat_lon_and_dates_triples = map(lat_lon_date, observations)
     lat, lon, dates = list(zip(*lat_lon_and_dates_triples))
-    print(dates[5030: 5037])
-    # Talk to professor about needing to add mixed='true' to to_datetime in order to work with walk2
-    return pd.DataFrame({"lat": lat, "lon": lon, "date": pd.to_datetime(dates, utc=True)})
+    return pd.DataFrame({"lat": lat, "lon": lon, "date": pd.to_datetime(dates, utc=True, format='ISO8601')})
 
 
 def averages_in_nearest_four_seconds(df: pd.DataFrame) -> pd.DataFrame:
