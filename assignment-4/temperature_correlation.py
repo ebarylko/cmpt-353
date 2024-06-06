@@ -109,7 +109,6 @@ def avg_temperatures(stations: pd.DataFrame, cities: pd.DataFrame):
     calc_avg_tmp = ft.partial(closest_station, stations)
     lat_and_lon = join_lat_and_lon(cities)
     return lat_and_lon.apply(calc_avg_tmp)['avg_tmax']
-    # return cities.apply(calc_avg_tmp, axis=1)['avg_tmax']
 
 
 def plot_population_density_against_temperature(pop_density: pd.Series, average_temperatures: pd.Series, name):
