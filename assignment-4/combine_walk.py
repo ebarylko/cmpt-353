@@ -114,7 +114,7 @@ def best_offset(phone_data: pd.DataFrame, accelerometer_data: pd.DataFrame, offs
     and the x-axis acceleration values in accelerometer_data after applying the offset to the time in phone_data
     """
     def sort_by_correlation_value(coll):
-        return sorted(coll, key=lambda c: c[0], reverse=True)
+        return sorted(coll, key=lambda c: c[1], reverse=True)
 
     def is_valid_correlation_value(coll):
         return coll[1]
