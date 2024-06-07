@@ -1,12 +1,12 @@
-import numpy
 import pandas as pd
 import pandas.testing as pdt
 import numpy as np
 import temperature_correlation as tc
+import toolz as tz
 
 sample_cities = pd.DataFrame({"name": ["a", "b", "c", "d"],
-                              "population": [1, 2, numpy.nan, 4],
-                              "area": [1, numpy.nan, 3, 10001],
+                              "population": [1, 2, np.nan, 4],
+                              "area": [1, np.nan, 3, 10001],
                               "latitude": [1, 2, 3, 4],
                               "longitude": [1, 2, 3, 4]})
 
@@ -22,7 +22,13 @@ def test_remove_invalid_cities():
                            check_dtype=False)
 
 
-sample_city = pd.Series([1, 1])
+val = tz.compose(np.cos, np.radians)(1)
+sample_city = tz.thread_first(
+    [1, 1],
+    np.radians,
+    (np.append, val),
+    pd.Series
+)
 
 sample_stations = pd.DataFrame({"observations": [1, 1, 1],
                                 "avg_tmax": [1, 2, 3],
@@ -38,9 +44,16 @@ expected_station = pd.Series({"observations": 1,
                               "longitude": 0,
                               "elevation": 1})
 
+def convert_lat_lon_to_rad(coll):
+    cos_of_lat = tz.compose(np.cos, np.radians)
+    return tz.thread_first(
+        coll[0:2],
+        np.radians,
+        (np.append, cos_of_lat(coll[2])))
+
 
 def test_distance():
-    assert round(tc.distance(np.radians([1, 1]), np.radians([0, 0]))) == 157249
+    assert round(tc.distance(convert_lat_lon_to_rad([1, 1, 1]), convert_lat_lon_to_rad([0, 0, 0]))) == 157249
 
 
 def test_closest_station():

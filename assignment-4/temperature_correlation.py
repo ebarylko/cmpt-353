@@ -61,27 +61,31 @@ def distance(fst_loc, snd_loc):
         return m.sin(diff_between(y, x)) ** 2
 
     earth_radius_in_meters = 6371000
-    fst_lat, fst_lon = fst_loc
-    snd_lat, snd_lon = snd_loc
+    print(fst_loc)
+    fst_lat, fst_lon, cos_of_fst_lat = fst_loc
+    snd_lat, snd_lon, cos_of_snd_lat = snd_loc
 
     # fst_lat_in_rad = m.radians(fst_lat)
     # snd_lat_in_rad = m.radians(snd_lat)
     tmp = m.sqrt(
-        sin_squared(fst_lat, snd_lat) + m.cos(fst_lat) * m.cos(snd_lat) * sin_squared(fst_lon, snd_lon)
+        sin_squared(fst_lat, snd_lat) + cos_of_fst_lat * cos_of_snd_lat * sin_squared(fst_lon, snd_lon)
     )
 
     dst_from_a_to_b = 2 * earth_radius_in_meters * m.asin(tmp)
     return dst_from_a_to_b
 
 
-def join_lat_and_lon(df: pd.DataFrame) -> pd.Series:
+def get_lat_and_lon_in_rad(df: pd.DataFrame) -> pd.Series:
     """
     @param df: a DataFrame containing longitude and latitude as its columns with additional information
-    @return: a Series containing the latitude and longitude of the DataFrame
+    @return: a Series containing the latitude, longitude, and cosine of the latitude of the DataFrame in radians
     """
-    latitude = df['latitude']
-    longitude = df['longitude']
-    return latitude.combine(longitude, lambda x, y: [x, y])
+
+    latitude_in_rad = np.radians(df['latitude'])
+    longitude_in_rad = np.radians(df['longitude'])
+    cos_of_latitude = np.cos(latitude_in_rad)
+    return (latitude_in_rad.combine(longitude_in_rad, lambda x, y: [x, y])
+            .combine(cos_of_latitude, lambda c, v: np.append(c, v)))
 
 
 def closest_station(stations: pd.DataFrame, city: pd.Series) -> pd.Series:
@@ -92,9 +96,9 @@ def closest_station(stations: pd.DataFrame, city: pd.Series) -> pd.Series:
     @return: the first station closest to the city
     """
 
-    calc_distance = ft.partial(distance, [city[0], city[1]])
-    lat_and_lon = join_lat_and_lon(stations)
-    row_of_closest_city = lat_and_lon.apply(calc_distance).idxmin()
+    calc_distance = ft.partial(distance, [city[0], city[1], city[2]])
+    lat_and_lon_in_rad = get_lat_and_lon_in_rad(stations)
+    row_of_closest_city = lat_and_lon_in_rad.apply(calc_distance).idxmin()
     return stations.iloc[row_of_closest_city]
 
 
@@ -109,7 +113,7 @@ def avg_temperatures(stations: pd.DataFrame, cities: pd.DataFrame):
     station for each city
     """
     calc_avg_tmp = ft.partial(closest_station, stations)
-    lat_and_lon = join_lat_and_lon(cities)
+    lat_and_lon = get_lat_and_lon_in_rad(cities)
     return lat_and_lon.apply(calc_avg_tmp)['avg_tmax']
 
 
