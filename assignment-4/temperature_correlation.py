@@ -93,7 +93,6 @@ def closest_station(stations: pd.DataFrame, station_info, city: pd.Series) -> pd
     """
 
     calc_distance = ft.partial(distance, [city[0], city[1], city[2]])
-    # lat_and_lon_in_rad = get_lat_and_lon_in_rad(stations)
     row_of_closest_city = station_info.apply(calc_distance).idxmin()
     return stations.iloc[row_of_closest_city]
 
@@ -138,7 +137,7 @@ if not os.getenv("TESTING"):
     valid_city_data = remove_invalid_cities(city_data)
 
     avgs_for_all_cities = avg_temperatures(station_data, valid_city_data)
-    # file_name = sys.argv[3]
-    # plot_population_density_against_temperature(valid_city_data['population_density'],
-    #                                             avgs_for_all_cities,
-    #                                             file_name)
+    file_name = sys.argv[3]
+    plot_population_density_against_temperature(valid_city_data['population_density'],
+                                                avgs_for_all_cities,
+                                                file_name)
