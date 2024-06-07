@@ -55,18 +55,14 @@ def distance(fst_loc, snd_loc):
 
     def diff_between(x, y):
         return (x - y) / 2
-        # return m.radians(x - y) / 2
 
     def sin_squared(x, y):
         return m.sin(diff_between(y, x)) ** 2
 
     earth_radius_in_meters = 6371000
-    print(fst_loc)
     fst_lat, fst_lon, cos_of_fst_lat = fst_loc
     snd_lat, snd_lon, cos_of_snd_lat = snd_loc
 
-    # fst_lat_in_rad = m.radians(fst_lat)
-    # snd_lat_in_rad = m.radians(snd_lat)
     tmp = m.sqrt(
         sin_squared(fst_lat, snd_lat) + cos_of_fst_lat * cos_of_snd_lat * sin_squared(fst_lon, snd_lon)
     )
@@ -88,7 +84,7 @@ def get_lat_and_lon_in_rad(df: pd.DataFrame) -> pd.Series:
             .combine(cos_of_latitude, lambda c, v: np.append(c, v)))
 
 
-def closest_station(stations: pd.DataFrame, city: pd.Series) -> pd.Series:
+def closest_station(stations: pd.DataFrame, station_info, city: pd.Series) -> pd.Series:
     """
     @param city: a Series containing the name of the city, longitude, latitude, and other information
     @param stations: a DataFrame where the rows contain the name of the station, longitude, latitude, elevation, average
@@ -97,8 +93,8 @@ def closest_station(stations: pd.DataFrame, city: pd.Series) -> pd.Series:
     """
 
     calc_distance = ft.partial(distance, [city[0], city[1], city[2]])
-    lat_and_lon_in_rad = get_lat_and_lon_in_rad(stations)
-    row_of_closest_city = lat_and_lon_in_rad.apply(calc_distance).idxmin()
+    # lat_and_lon_in_rad = get_lat_and_lon_in_rad(stations)
+    row_of_closest_city = station_info.apply(calc_distance).idxmin()
     return stations.iloc[row_of_closest_city]
 
 
@@ -112,7 +108,8 @@ def avg_temperatures(stations: pd.DataFrame, cities: pd.DataFrame):
     @return: the average temperature associated to the closest weather
     station for each city
     """
-    calc_avg_tmp = ft.partial(closest_station, stations)
+    lat_and_lon_of_stations = get_lat_and_lon_in_rad(stations)
+    calc_avg_tmp = ft.partial(closest_station, stations, lat_and_lon_of_stations)
     lat_and_lon = get_lat_and_lon_in_rad(cities)
     return lat_and_lon.apply(calc_avg_tmp)['avg_tmax']
 
@@ -141,7 +138,7 @@ if not os.getenv("TESTING"):
     valid_city_data = remove_invalid_cities(city_data)
 
     avgs_for_all_cities = avg_temperatures(station_data, valid_city_data)
-    file_name = sys.argv[3]
-    plot_population_density_against_temperature(valid_city_data['population_density'],
-                                                avgs_for_all_cities,
-                                                file_name)
+    # file_name = sys.argv[3]
+    # plot_population_density_against_temperature(valid_city_data['population_density'],
+    #                                             avgs_for_all_cities,
+    #                                             file_name)

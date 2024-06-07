@@ -62,23 +62,23 @@ def test_closest_station():
 
 
 #
-# example_cities = pd.DataFrame({"name": ["a", "b", "c"],
-#                                "population": [1, 2, 3],
-#                                "area": [1, 4, 9],
-#                                "latitude": [1, 2, 3],
-#                                "longitude": [1, 1, 2]})
-#
-# example_stations = pd.DataFrame({"observations": [1, 1],
-#                                  "avg_tmax": [1, 2],
-#                                  "station": ["a1", "a2"],
-#                                  "latitude": [0, 0],
-#                                  "longitude": [0, 2],
-#                                  "elevation": [1, 3]})
-#
-# expected_avgs = pd.Series([1, 1, 2])
-#
-#
-# def test_avg_temperatures():
-#     pdt.assert_series_equal(tc.avg_temperatures(example_stations, example_cities),
-#                             expected_avgs,
-#                             check_names=False)
+example_cities = pd.DataFrame({"name": ["a", "b", "c"],
+                               "population": [1, 2, 3],
+                               "area": [1, 4, 9],
+                               "latitude": [1, 2, 3],
+                               "longitude": [1, 1, 2]})
+
+example_stations = pd.DataFrame({"observations": [1, 1],
+                                 "avg_tmax": [1, 2],
+                                 "station": ["a1", "a2"],
+                                 "latitude": [0, 0],
+                                 "longitude": [0, 2],
+                                 "elevation": [1, 3]})
+
+expected_avgs = pd.Series([1, 1, 2])
+
+
+def test_avg_temperatures():
+    pdt.assert_series_equal(tc.avg_temperatures(example_stations, example_cities),
+                            expected_avgs,
+                            check_names=False)
