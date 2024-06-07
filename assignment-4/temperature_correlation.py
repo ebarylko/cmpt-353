@@ -78,13 +78,13 @@ def get_lat_and_lon_in_rad(df: pd.DataFrame) -> pd.Series:
     """
 
     latitude_in_rad = np.radians(df['latitude'])
-    longitude_in_rad = np.radians(df['longitude'])
+    df['longitude'] = np.radians(df['longitude'])
     cos_of_latitude = np.cos(latitude_in_rad)
     return (latitude_in_rad.combine(longitude_in_rad, lambda x, y: [x, y])
             .combine(cos_of_latitude, lambda c, v: np.append(c, v)))
 
 
-def closest_station(stations: pd.DataFrame, station_info, city: pd.Series) -> pd.Series:
+def closest_station(stations: pd.DataFrame, city: pd.Series) -> pd.Series:
     """
     @param city: a Series containing the name of the city, longitude, latitude, and other information
     @param stations: a DataFrame where the rows contain the name of the station, longitude, latitude, elevation, average
@@ -107,10 +107,12 @@ def avg_temperatures(stations: pd.DataFrame, cities: pd.DataFrame):
     @return: the average temperature associated to the closest weather
     station for each city
     """
-    lat_and_lon_of_stations = get_lat_and_lon_in_rad(stations)
-    calc_avg_tmp = ft.partial(closest_station, stations, lat_and_lon_of_stations)
-    lat_and_lon = get_lat_and_lon_in_rad(cities)
-    return lat_and_lon.apply(calc_avg_tmp)['avg_tmax']
+    # lat_and_lon_of_stations = get_lat_and_lon_in_rad(stations)
+    calc_avg_tmp = ft.partial(closest_station, stations)
+    return cities.apply(calc_avg_tmp)['avg_tmax']
+    # lat_and_lon = get_lat_and_lon_in_rad(cities)
+    # return lat_and_lon.apply(calc_avg_tmp)['avg_tmax']
+    # Change this so that you do the difference of the columns in order to have a speed up
 
 
 def plot_population_density_against_temperature(pop_density: pd.Series, average_temperatures: pd.Series, name):
