@@ -23,12 +23,6 @@ def test_remove_invalid_cities():
 
 
 val = tz.compose(np.cos, np.radians)(1)
-sample_city = tz.thread_first(
-    [1, 1],
-    np.radians,
-    (np.append, val),
-    pd.Series
-)
 
 sample_stations = pd.DataFrame({"observations": [1, 1, 1],
                                 "avg_tmax": [1, 2, 3],
@@ -44,24 +38,25 @@ expected_station = pd.Series({"observations": 1,
                               "longitude": 0,
                               "elevation": 1})
 
-def convert_lat_lon_to_rad(coll):
-    cos_of_lat = tz.compose(np.cos, np.radians)
-    return tz.thread_first(
-        coll[0:2],
-        np.radians,
-        (np.append, cos_of_lat(coll[2])))
+# def convert_lat_lon_to_rad(coll):
+#     cos_of_lat = tz.compose(np.cos, np.radians)
+#     return tz.thread_first(
+#         coll[0:2],
+#         np.radians,
+#         (np.append, cos_of_lat(coll[2])))
+#
+#
+# def test_distance():
+#     assert round(tc.distance(convert_lat_lon_to_rad([1, 1, 1]), convert_lat_lon_to_rad([0, 0, 0]))) == 157249
 
 
-def test_distance():
-    assert round(tc.distance(convert_lat_lon_to_rad([1, 1, 1]), convert_lat_lon_to_rad([0, 0, 0]))) == 157249
-
+sample_city = pd.Series([1, 1], index=['latitude', 'longitude'])
 
 def test_closest_station():
     pdt.assert_series_equal(tc.closest_station(sample_stations, sample_city), expected_station,
                             check_names=False)
 
 
-#
 example_cities = pd.DataFrame({"name": ["a", "b", "c"],
                                "population": [1, 2, 3],
                                "area": [1, 4, 9],

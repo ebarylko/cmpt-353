@@ -46,42 +46,29 @@ def remove_invalid_cities(cities: pd.DataFrame) -> pd.DataFrame:
     return cities.dropna().query("area < 10000")
 
 
-def distance(fst_loc, snd_loc):
+def calc_distance(city: pd.Series, stations: pd.DataFrame) -> pd.Series:
     """
-    @param fst_loc: a collection containing a latitude and longitude
-    @param snd_loc: a collection containing a latitude and longitude for a location
-    @return: the distance between fst_loc and snd_loc
+    @param city: a Series containing the name of the city, longitude, latitude, and other information
+    @param stations: a DataFrame where the rows contain the name of the station, longitude, latitude, elevation, average
+    @return: a series where each entry contains the distance from the city to a specific station
     """
-
     def diff_between(x, y):
         return (x - y) / 2
 
     def sin_squared(x, y):
-        return m.sin(diff_between(y, x)) ** 2
+        return np.sin(diff_between(y, x)) ** 2
 
-    earth_radius_in_meters = 6371000
-    fst_lat, fst_lon, cos_of_fst_lat = fst_loc
-    snd_lat, snd_lon, cos_of_snd_lat = snd_loc
+    city_lat_in_rad, city_lon_in_rad = np.radians(city.latitude), np.radians(city.longitude)
+    station_lat_in_rad, station_lon_in_rad = np.radians(stations['latitude']), np.radians(stations['longitude'])
 
-    tmp = m.sqrt(
-        sin_squared(fst_lat, snd_lat) + cos_of_fst_lat * cos_of_snd_lat * sin_squared(fst_lon, snd_lon)
+    tmp = np.sqrt(
+        sin_squared(city_lat_in_rad, station_lat_in_rad)
+        + np.cos(city_lat_in_rad) * np.cos(station_lat_in_rad) * sin_squared(city_lon_in_rad, station_lon_in_rad)
     )
 
-    dst_from_a_to_b = 2 * earth_radius_in_meters * m.asin(tmp)
+    earth_radius_in_meters = 6371000
+    dst_from_a_to_b = 2 * earth_radius_in_meters * np.arcsin(tmp)
     return dst_from_a_to_b
-
-
-def get_lat_and_lon_in_rad(df: pd.DataFrame) -> pd.Series:
-    """
-    @param df: a DataFrame containing longitude and latitude as its columns with additional information
-    @return: a Series containing the latitude, longitude, and cosine of the latitude of the DataFrame in radians
-    """
-
-    latitude_in_rad = np.radians(df['latitude'])
-    df['longitude'] = np.radians(df['longitude'])
-    cos_of_latitude = np.cos(latitude_in_rad)
-    return (latitude_in_rad.combine(longitude_in_rad, lambda x, y: [x, y])
-            .combine(cos_of_latitude, lambda c, v: np.append(c, v)))
 
 
 def closest_station(stations: pd.DataFrame, city: pd.Series) -> pd.Series:
@@ -92,8 +79,8 @@ def closest_station(stations: pd.DataFrame, city: pd.Series) -> pd.Series:
     @return: the first station closest to the city
     """
 
-    calc_distance = ft.partial(distance, [city[0], city[1], city[2]])
-    row_of_closest_city = station_info.apply(calc_distance).idxmin()
+    distance_to_each_station = calc_distance(city, stations)
+    row_of_closest_city = distance_to_each_station.idxmin()
     return stations.iloc[row_of_closest_city]
 
 
@@ -107,11 +94,8 @@ def avg_temperatures(stations: pd.DataFrame, cities: pd.DataFrame):
     @return: the average temperature associated to the closest weather
     station for each city
     """
-    # lat_and_lon_of_stations = get_lat_and_lon_in_rad(stations)
     calc_avg_tmp = ft.partial(closest_station, stations)
-    return cities.apply(calc_avg_tmp)['avg_tmax']
-    # lat_and_lon = get_lat_and_lon_in_rad(cities)
-    # return lat_and_lon.apply(calc_avg_tmp)['avg_tmax']
+    return cities.apply(calc_avg_tmp, axis='columns')['avg_tmax']
     # Change this so that you do the difference of the columns in order to have a speed up
 
 
@@ -139,7 +123,7 @@ if not os.getenv("TESTING"):
     valid_city_data = remove_invalid_cities(city_data)
 
     avgs_for_all_cities = avg_temperatures(station_data, valid_city_data)
-    file_name = sys.argv[3]
-    plot_population_density_against_temperature(valid_city_data['population_density'],
-                                                avgs_for_all_cities,
-                                                file_name)
+    # file_name = sys.argv[3]
+    # plot_population_density_against_temperature(valid_city_data['population_density'],
+    #                                             avgs_for_all_cities,
+    #                                             file_name)
