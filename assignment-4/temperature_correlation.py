@@ -1,6 +1,7 @@
 import os
 import sys
 import pandas as pd
+import numpy as np
 import math as m
 import functools as ft
 import matplotlib.pyplot as plt
@@ -53,7 +54,8 @@ def distance(fst_loc, snd_loc):
     """
 
     def diff_between(x, y):
-        return m.radians(x - y) / 2
+        return (x - y) / 2
+        # return m.radians(x - y) / 2
 
     def sin_squared(x, y):
         return m.sin(diff_between(y, x)) ** 2
@@ -62,10 +64,10 @@ def distance(fst_loc, snd_loc):
     fst_lat, fst_lon = fst_loc
     snd_lat, snd_lon = snd_loc
 
-    fst_lat_in_rad = m.radians(fst_lat)
-    snd_lat_in_rad = m.radians(snd_lat)
+    # fst_lat_in_rad = m.radians(fst_lat)
+    # snd_lat_in_rad = m.radians(snd_lat)
     tmp = m.sqrt(
-        sin_squared(fst_lat, snd_lat) + m.cos(fst_lat_in_rad) * m.cos(snd_lat_in_rad) * sin_squared(fst_lon, snd_lon)
+        sin_squared(fst_lat, snd_lat) + m.cos(fst_lat) * m.cos(snd_lat) * sin_squared(fst_lon, snd_lon)
     )
 
     dst_from_a_to_b = 2 * earth_radius_in_meters * m.asin(tmp)
