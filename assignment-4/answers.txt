@@ -6,6 +6,6 @@ density of a city from the average temperature may not give the most accurate re
 2. Compressing the data allows the storage of larger datasets in a more compact form,
 using less storage on a computer compared to its uncompressed form. By decompressing the
 data only when we need it, we are able to work with multiple compressed large datasets
-using only a fraction of the storage required than if the data had been uncompressed.
-Therefore, we would be able to work with a compressed large dataset faster than
-with an uncompressed one since we are using less storage space.
+efficiently by using only a fraction of the storage required than if the data had been
+uncompressed. Therefore, we would be able to work with a compressed large dataset faster than
+with an uncompressed one since we are using less significantly less storage space.
