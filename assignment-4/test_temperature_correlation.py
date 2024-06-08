@@ -38,17 +38,6 @@ expected_station = pd.Series({"observations": 1,
                               "longitude": 0,
                               "elevation": 1})
 
-# def convert_lat_lon_to_rad(coll):
-#     cos_of_lat = tz.compose(np.cos, np.radians)
-#     return tz.thread_first(
-#         coll[0:2],
-#         np.radians,
-#         (np.append, cos_of_lat(coll[2])))
-#
-#
-# def test_distance():
-#     assert round(tc.distance(convert_lat_lon_to_rad([1, 1, 1]), convert_lat_lon_to_rad([0, 0, 0]))) == 157249
-
 
 sample_city = pd.Series([1, 1], index=['latitude', 'longitude'])
 
