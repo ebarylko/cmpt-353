@@ -96,7 +96,6 @@ def avg_temperatures(stations: pd.DataFrame, cities: pd.DataFrame):
     """
     calc_avg_tmp = ft.partial(closest_station, stations)
     return cities.apply(calc_avg_tmp, axis='columns')['avg_tmax']
-    # Change this so that you do the difference of the columns in order to have a speed up
 
 
 def plot_population_density_against_temperature(pop_density: pd.Series, average_temperatures: pd.Series, name):
