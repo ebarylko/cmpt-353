@@ -1,0 +1,28 @@
+First dataset:
+This dataset holds a collection of x and y values contains a strong positive correlation between them.
+
+Second dataset:
+
+This dataset has a strong positive correlation between the x and y values and has most of the data concentrated
+at (-9, 9) on the x-axis.
+
+Third dataset:
+
+This dataset contains clusters of data spaced out by two units on the x-axis, with each cluster's
+y values being 0.5 +- the mean value of the cluster.
+
+Fourth dataset:
+
+This dataset has an extremely weak linear relationship and has some of the data points spelling out SFU.
+
+Fifth dataset:
+
+This dataset has an extremely weak negative correlation and the data can be separated into five distinct
+groups: those having an x-value in the range of 4 to 10 (inclusive); data having an x-value between 27 and 30,
+data having an x-value between 46 and 50, data having an x-value between 66 and 70, and data having an x-value between
+90 and 94.
+
+Sixth dataset:
+
+This data shows an extremely positive linear relationship, with only two points that can not be mapped to the best
+fit line.
