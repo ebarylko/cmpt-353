@@ -1,4 +1,5 @@
 import sys
+import pandas as pd
 
 
 OUTPUT_TEMPLATE = (
@@ -16,23 +17,24 @@ OUTPUT_TEMPLATE = (
 
 def main():
     reddit_counts = sys.argv[1]
-
+    counts = pd.read_json(reddit_counts, lines=True)
+    print(counts)
     # ...
 
-    print(OUTPUT_TEMPLATE.format(
-        initial_ttest_p=0,
-        initial_weekday_normality_p=0,
-        initial_weekend_normality_p=0,
-        initial_levene_p=0,
-        transformed_weekday_normality_p=0,
-        transformed_weekend_normality_p=0,
-        transformed_levene_p=0,
-        weekly_weekday_normality_p=0,
-        weekly_weekend_normality_p=0,
-        weekly_levene_p=0,
-        weekly_ttest_p=0,
-        utest_p=0,
-    ))
+    # print(OUTPUT_TEMPLATE.format(
+    #     initial_ttest_p=0,
+    #     initial_weekday_normality_p=0,
+    #     initial_weekend_normality_p=0,
+    #     initial_levene_p=0,
+    #     transformed_weekday_normality_p=0,
+    #     transformed_weekend_normality_p=0,
+    #     transformed_levene_p=0,
+    #     weekly_weekday_normality_p=0,
+    #     weekly_weekend_normality_p=0,
+    #     weekly_levene_p=0,
+    #     weekly_ttest_p=0,
+    #     utest_p=0,
+    # ))
 
 
 if __name__ == '__main__':
