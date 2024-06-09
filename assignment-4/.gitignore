@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+package.json
+output/
+output.svg
+.DS_STORE
