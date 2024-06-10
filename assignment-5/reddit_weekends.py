@@ -2,6 +2,8 @@ import pandas as pd
 import os
 import sys
 from scipy import stats
+from matplotlib import pyplot as plt
+from matplotlib.pyplot import hist
 
 
 def comments_only_in_2012_or_2013(comments: pd.DataFrame) -> pd.DataFrame:
@@ -43,6 +45,17 @@ def valid_comments(comments: pd.DataFrame):
     )
 
 
+def select_f_which_maximizes_normality(funcs, weekday_comments, weekend_comments):
+    """
+    @param funcs: a collection of functions
+    @param weekday_comments: a DataFrame containing the reddit comments occurring on the weekdays
+    @param weekend_comments:a DataFrame containing the reddit comments occurring on the weekends
+    @return: the function F in funcs which maximizes the p-value for the normality tests applied
+    on weekday_comments and weekend_comments after applying F to both of them
+    """
+    def
+
+
 if not os.getenv('TESTING'):
     comment_file = sys.argv[1]
     reddit_comments = pd.read_json(comment_file, lines=True)
@@ -57,4 +70,7 @@ if not os.getenv('TESTING'):
     print(wkend_normality)
     equal_var = stats.levene(wkday_comments, wkend_comments).pvalue
     print(equal_var)
+    # hist(wkend_comments)
+    hist(wkday_comments)
+    plt.show()
 
