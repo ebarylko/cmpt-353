@@ -21,13 +21,16 @@ def test_separate_weekends_and_weekdays():
 
 sample_comments = pd.DataFrame({"date": [pd.Timestamp(2024, 1, 9),
                                          pd.Timestamp(2011, 8, 1),
-                                         pd.Timestamp(2013, 9, 4)],
-                                "subreddit": [1, 2, 3],
-                                "comment_count": [1, 9, 7]})
+                                         pd.Timestamp(2013, 9, 4),
+                                         pd.Timestamp(2012, 1, 1),
+                                         pd.Timestamp(2014, 1, 1)],
+                                "subreddit": [1, 2, 3, 4, 5],
+                                "comment_count": [1, 9, 7, 3, 4]})
 
-expected_comments = pd.DataFrame({'date': [pd.Timestamp(2013, 9, 4)],
-                                  'subreddit': [3],
-                                  'comment_count': [7]})
+expected_comments = pd.DataFrame({'date': [pd.Timestamp(2013, 9, 4),
+                                           pd.Timestamp(2012, 1, 1)],
+                                  'subreddit': [3, 4],
+                                  'comment_count': [7, 3]})
 
 
 def test_comments_only_in_2012_or_2013():
