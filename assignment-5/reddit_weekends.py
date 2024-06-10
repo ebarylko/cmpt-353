@@ -29,18 +29,32 @@ def separate_weekends_and_weekdays(data: pd.DataFrame):
     return weekday_comments, weekend_comments
 
 
+def comments_only_in_canada_subreddit(comments: pd.DataFrame) -> pd.DataFrame:
+    """
+    @param comments: a DataFrame containing the date, subreddit name, and comment count in each row
+    @return: a DataFrame containing only the comments made in the r/canada subreddit
+    """
+    return comments.query('subreddit == "canada"')
+
+
+def valid_comments(comments: pd.DataFrame):
+    return comments_only_in_canada_subreddit(
+        comments_only_in_2012_or_2013(comments)
+    )
+
+
 if not os.getenv('TESTING'):
     comment_file = sys.argv[1]
     reddit_comments = pd.read_json(comment_file, lines=True)
-    # filtered_comments = comments_only_in_2013_or_2014(reddit_comments)
-    # comments_in_2015 = reddit_comments['date'] > '2015-01-01'
-    # print(reddit_comments[comments_in_2015])
-    # wkday_comments, wkend_comments = separate_weekends_and_weekdays(reddit_comments)
-    # pval = stats.ttest_ind(wkend_comments, wkend_comments).pvalue
-    # print(pval)
-    # wkday_normality, wkend_normality = stats.normaltest(wkday_comments).pvalue, stats.normaltest(wkend_comments).pvalue
-    # print(wkday_normality)
-    # print(wkend_normality)
-    # equal_var = stats.levene(wkday_comments, wkend_comments)
-    # print(equal_var)
+    filtered_comments = comments_only_in_2012_or_2013(reddit_comments)
+    # print(reddit_comments)
+    # print(filtered_comments)
+    wkday_comments, wkend_comments = separate_weekends_and_weekdays(filtered_comments)
+    pval = stats.ttest_ind(wkend_comments, wkend_comments).pvalue
+    print(pval)
+    wkday_normality, wkend_normality = stats.normaltest(wkday_comments).pvalue, stats.normaltest(wkend_comments).pvalue
+    print(wkday_normality)
+    print(wkend_normality)
+    equal_var = stats.levene(wkday_comments, wkend_comments).pvalue
+    print(equal_var)
 

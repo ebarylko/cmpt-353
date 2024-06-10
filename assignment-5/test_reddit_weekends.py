@@ -36,3 +36,19 @@ expected_comments = pd.DataFrame({'date': [pd.Timestamp(2013, 9, 4),
 def test_comments_only_in_2012_or_2013():
     pdt.assert_frame_equal(rw.comments_only_in_2012_or_2013(sample_comments).reset_index(drop=True),
                            expected_comments)
+
+
+sample_comments2 = pd.DataFrame({"date": [pd.Timestamp(2024, 1, 9),
+                                          pd.Timestamp(2012, 1, 1),
+                                          pd.Timestamp(2014, 1, 1)],
+                                 "subreddit": ["canada", "Yukon", "Manitoba"],
+                                 "comment_count": [1, 9, 7]})
+
+comments_only_in_canada_subreddit = pd.DataFrame({"date": [pd.Timestamp(2024, 1, 9)],
+                                                  "subreddit": ["canada"],
+                                                  "comment_count": [1]})
+
+
+def test_comments_only_in_candada_subreddit():
+    pdt.assert_frame_equal(rw.comments_only_in_canada_subreddit(sample_comments2),
+                           comments_only_in_canada_subreddit)
