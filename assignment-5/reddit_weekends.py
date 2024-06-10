@@ -46,7 +46,7 @@ def valid_comments(comments: pd.DataFrame):
 if not os.getenv('TESTING'):
     comment_file = sys.argv[1]
     reddit_comments = pd.read_json(comment_file, lines=True)
-    filtered_comments = comments_only_in_2012_or_2013(reddit_comments)
+    filtered_comments = valid_comments(reddit_comments)
     # print(reddit_comments)
     # print(filtered_comments)
     wkday_comments, wkend_comments = separate_weekends_and_weekdays(filtered_comments)
