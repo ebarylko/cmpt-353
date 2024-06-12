@@ -5,7 +5,7 @@ from scipy import stats
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import hist
 import numpy as np
-from decimal import Decimal
+import operator as op
 
 
 def comments_only_in_2012_or_2013(comments: pd.DataFrame) -> pd.DataFrame:
@@ -61,6 +61,24 @@ def get_normality_value_after_applying_f(f, weekday_comments, weekend_comments):
     return wkday_pvalue, wkend_pvalue
 
 
+def mean_of_comment_counts(comments: pd.DataFrame) -> pd.Series:
+    """
+    @param comments: a DataFrame containing the date, subreddit name, and comment count in each row
+    @return: a Series containing the averages of the comments occurring in the same week and
+    year
+    """
+    def year_and_week(date):
+        """
+        @param date: the date corresponding to a comment posted on a subreddit
+        @return: the year and week the comment was posted
+        """
+        return date.isocalendar()[0:2]
+
+    return comments.set_index('date').groupby(year_and_week).agg({"comment_count": 'mean'})['comment_count']
+
+
+
+
 if not os.getenv('TESTING'):
     comment_file = sys.argv[1]
     reddit_comments = pd.read_json(comment_file, lines=True)
@@ -74,3 +92,4 @@ if not os.getenv('TESTING'):
     # print(wkday_normality)
     # print(wkend_normality)
     # equal_var = stats.levene(wkday_comments, wkend_comments).pvalue
+

@@ -59,4 +59,21 @@ def test_comments_only_in_candada_subreddit():
                            comments_only_in_canada_subreddit)
 
 
+sample_comments3 = pd.DataFrame({"date": [pd.Timestamp(2019, 9, 9),
+                                          pd.Timestamp(2019, 9, 10),
+                                          pd.Timestamp(2009, 9, 9),
+                                          ],
+                                 "subreddit": ["r/a", "r/b", "r/c"],
+                                 "comment_count": [4, 2, 3]})
+
+expected_comment_means = pd.Series([3, 3])
+
+print(rw.mean_of_comment_counts(sample_comments3))
+
+
+def test_mean_of_weekend_and_weekday_comments():
+    pdt.assert_series_equal(rw.mean_of_comment_counts(sample_comments3), expected_comment_means,
+                            check_index=False,
+                            check_dtype=False,
+                            check_names=False)
 
