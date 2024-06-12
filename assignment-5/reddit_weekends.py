@@ -47,18 +47,19 @@ def valid_comments(comments: pd.DataFrame):
     )
 
 
-def get_normality_value_after_applying_f(f, weekday_comments, weekend_comments):
+def get_normality_and_levene_value(weekday_comments: pd.Series, weekend_comments: pd.Series):
     """
-    @param f:
-    @param weekday_comments:
-    @param weekend_comments:
-    @return:
+    @param weekday_comments: a Series containing the comment counts of all comments made on
+    weekdays
+    @param weekend_comments:a Series containing the comment counts of all comments made on
+    weekends
+    @return: a collection of the pvalues of the normality tests for the weekday and weekend comments and
+    the pvalue of the Levene test
     """
-    transformed_wkday_comments = f(weekday_comments)
-    transformed_wkend_comments = f(weekend_comments)
-    wkday_pvalue, wkend_pvalue = (stats.normaltest(transformed_wkday_comments).pvalue,
-                                  stats.normaltest(transformed_wkend_comments).pvalue)
-    return wkday_pvalue, wkend_pvalue
+    wkday_pvalue, wkend_pvalue = (stats.normaltest(weekday_comments).pvalue,
+                                  stats.normaltest(weekend_comments).pvalue)
+    levene_pvalue = stats.levene(weekday_comments, weekend_comments).pvalue
+    return wkday_pvalue, wkend_pvalue, levene_pvalue
 
 
 def mean_of_comment_counts(comments: pd.DataFrame) -> pd.Series:
@@ -77,19 +78,70 @@ def mean_of_comment_counts(comments: pd.DataFrame) -> pd.Series:
     return comments.set_index('date').groupby(year_and_week).agg({"comment_count": 'mean'})['comment_count']
 
 
+def ttest_pval(weekday_comments, weekend_comments):
+    return stats.ttest_ind(weekday_comments, weekend_comments).pvalue
+
+OUTPUT_TEMPLATE = (
+    "Initial T-test p-value: {initial_ttest_p:.3g}\n"
+    "Original data normality p-values: {initial_weekday_normality_p:.3g} {initial_weekend_normality_p:.3g}\n"
+    "Original data equal-variance p-value: {initial_levene_p:.3g}\n"
+    "Transformed data normality p-values: {transformed_weekday_normality_p:.3g} {transformed_weekend_normality_p:.3g}\n"
+    "Transformed data equal-variance p-value: {transformed_levene_p:.3g}\n"
+    "Weekly data normality p-values: {weekly_weekday_normality_p:.3g} {weekly_weekend_normality_p:.3g}\n"
+    "Weekly data equal-variance p-value: {weekly_levene_p:.3g}\n"
+    "Weekly T-test p-value: {weekly_ttest_p:.3g}\n"
+    "Mann-Whitney U-test p-value: {utest_p:.3g}"
+)
+
+
+def print_out_statistics(initial_data_stats, transformed_data_stats, weekly_data_stats, mann_whitney_pvalue):
+    """
+    @param initial_data_stats: a collection containing the normality test pvalues for the initial weekday and
+    weekend comments, and the initial Levene and ttest pvalues
+    @param transformed_data_stats: a collection containing the normality test pvalues for the transformed weekday and
+    weekend comments, and the Levene test pvalue on the transformed dataset
+    @param weekly_data_stats: the pvalues for the normality test, Levene test, and ttest after taking the
+    averages of the comment counts
+    @param mann_whitney_pvalue: the pvalue obtained after applying the mann-whitney U-test
+    @return: prints out the information about each statistic
+    """
+    init_wkday_normality, init_wkend_normality, init_levene_val, init_ttest_val = initial_data_stats
+    new_wkday_normality, new_wkend_normality, new_levene_val = transformed_data_stats
+    weekly_wkday_normality, weekly_wkend_normality, weekly_levene_val, weekly_ttest_val =  weekly_data_stats
+
+    print(OUTPUT_TEMPLATE.format(
+        initial_ttest_p=init_ttest_val,
+        initial_weekday_normality_p=init_wkday_normality,
+        initial_weekend_normality_p=init_wkend_normality,
+        initial_levene_p=init_levene_val,
+        transformed_weekday_normality_p=new_wkday_normality,
+        transformed_weekend_normality_p=new_wkend_normality,
+        transformed_levene_p=new_levene_val,
+        weekly_weekday_normality_p=weekly_wkday_normality,
+        weekly_weekend_normality_p=weekly_wkend_normality,
+        weekly_levene_p=weekly_levene_val,
+        weekly_ttest_p=weekly_ttest_val,
+        utest_p=mann_whitney_pvalue,
+    ))
 
 
 if not os.getenv('TESTING'):
     comment_file = sys.argv[1]
     reddit_comments = pd.read_json(comment_file, lines=True)
     filtered_comments = valid_comments(reddit_comments)
-    # print(reddit_comments)
-    # print(filtered_comments)
     wkday_comments, wkend_comments = separate_weekends_and_weekdays(filtered_comments)
-    # pval = stats.ttest_ind(wkend_comments, wkend_comments).pvalue
-    # print(pval)
-    # wkday_normality, wkend_normality = stats.normaltest(wkday_comments).pvalue, stats.normaltest(wkend_comments).pvalue
-    # print(wkday_normality)
-    # print(wkend_normality)
-    # equal_var = stats.levene(wkday_comments, wkend_comments).pvalue
 
+    wkday_comment_counts, wkend_comment_counts = wkday_comments['comment_count'], wkend_comments['comment_count']
+    original_data_statistics = (get_normality_and_levene_value(wkday_comment_counts, wkend_comment_counts) +
+                                (ttest_pval(wkday_comment_counts, wkend_comment_counts),))
+
+    transformed_wkday_counts, transformed_wkend_counts = np.sqrt(wkday_comment_counts), np.sqrt(wkend_comment_counts)
+    transformed_statistics = get_normality_and_levene_value(transformed_wkday_counts, transformed_wkend_counts )
+
+    wkday_averages, wkend_averages = mean_of_comment_counts(wkday_comments), mean_of_comment_counts(wkend_comments)
+    weekly_statistics = (get_normality_and_levene_value(wkday_averages, wkend_averages) +
+                         (ttest_pval(wkday_averages, wkend_averages),))
+
+    whitney_pvalue = stats.mannwhitneyu(wkday_comment_counts, wkend_comment_counts).pvalue
+
+    print_out_statistics(original_data_statistics, transformed_statistics, weekly_statistics, whitney_pvalue)
