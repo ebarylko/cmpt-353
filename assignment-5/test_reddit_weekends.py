@@ -59,13 +59,4 @@ def test_comments_only_in_candada_subreddit():
                            comments_only_in_canada_subreddit)
 
 
-inc = tz.partial(op.add, 1)
 
-sample_wkday_comments = pd.Series(range(29))
-sample_wkend_comments = pd.Series(range(8, 49))
-
-
-def test_select_f_which_maximizes_normality():
-    assert rw.select_f_which_maximizes_normality((inc, np.exp),
-                                                 sample_wkday_comments,
-                                                 sample_wkend_comments) == inc

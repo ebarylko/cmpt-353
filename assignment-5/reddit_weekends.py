@@ -4,6 +4,8 @@ import sys
 from scipy import stats
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import hist
+import numpy as np
+from decimal import Decimal
 
 
 def comments_only_in_2012_or_2013(comments: pd.DataFrame) -> pd.DataFrame:
@@ -45,15 +47,18 @@ def valid_comments(comments: pd.DataFrame):
     )
 
 
-def select_f_which_maximizes_normality(funcs, weekday_comments, weekend_comments):
+def get_normality_value_after_applying_f(f, weekday_comments, weekend_comments):
     """
-    @param funcs: a collection of functions
-    @param weekday_comments: a DataFrame containing the reddit comments occurring on the weekdays
-    @param weekend_comments:a DataFrame containing the reddit comments occurring on the weekends
-    @return: the function F in funcs which maximizes the p-value for the normality tests applied
-    on weekday_comments and weekend_comments after applying F to both of them
+    @param f:
+    @param weekday_comments:
+    @param weekend_comments:
+    @return:
     """
-    def
+    transformed_wkday_comments = f(weekday_comments)
+    transformed_wkend_comments = f(weekend_comments)
+    wkday_pvalue, wkend_pvalue = (stats.normaltest(transformed_wkday_comments).pvalue,
+                                  stats.normaltest(transformed_wkend_comments).pvalue)
+    return wkday_pvalue, wkend_pvalue
 
 
 if not os.getenv('TESTING'):
@@ -63,14 +68,9 @@ if not os.getenv('TESTING'):
     # print(reddit_comments)
     # print(filtered_comments)
     wkday_comments, wkend_comments = separate_weekends_and_weekdays(filtered_comments)
-    pval = stats.ttest_ind(wkend_comments, wkend_comments).pvalue
-    print(pval)
-    wkday_normality, wkend_normality = stats.normaltest(wkday_comments).pvalue, stats.normaltest(wkend_comments).pvalue
-    print(wkday_normality)
-    print(wkend_normality)
-    equal_var = stats.levene(wkday_comments, wkend_comments).pvalue
-    print(equal_var)
-    # hist(wkend_comments)
-    hist(wkday_comments)
-    plt.show()
-
+    # pval = stats.ttest_ind(wkend_comments, wkend_comments).pvalue
+    # print(pval)
+    # wkday_normality, wkend_normality = stats.normaltest(wkday_comments).pvalue, stats.normaltest(wkend_comments).pvalue
+    # print(wkday_normality)
+    # print(wkend_normality)
+    # equal_var = stats.levene(wkday_comments, wkend_comments).pvalue
