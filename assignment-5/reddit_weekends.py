@@ -3,6 +3,8 @@ import os
 import sys
 from scipy import stats
 import numpy as np
+from matplotlib.pyplot import hist
+import matplotlib.pyplot as plt
 
 
 def comments_only_in_2012_or_2013(comments: pd.DataFrame) -> pd.DataFrame:
@@ -142,3 +144,7 @@ if not os.getenv('TESTING'):
     whitney_pvalue = stats.mannwhitneyu(wkday_comment_counts, wkend_comment_counts).pvalue
 
     print_out_statistics(original_data_statistics, transformed_statistics, weekly_statistics, whitney_pvalue)
+
+    hist(transformed_wkday_counts)
+    hist(transformed_wkend_counts)
+    plt.show()
