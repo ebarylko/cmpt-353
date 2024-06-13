@@ -2,10 +2,7 @@ import pandas as pd
 import os
 import sys
 from scipy import stats
-from matplotlib import pyplot as plt
-from matplotlib.pyplot import hist
 import numpy as np
-import operator as op
 
 
 def comments_only_in_2012_or_2013(comments: pd.DataFrame) -> pd.DataFrame:
