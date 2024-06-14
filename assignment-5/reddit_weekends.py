@@ -3,8 +3,6 @@ import os
 import sys
 from scipy import stats
 import numpy as np
-from matplotlib.pyplot import hist
-import matplotlib.pyplot as plt
 
 
 def comments_only_in_2012_or_2013(comments: pd.DataFrame) -> pd.DataFrame:
@@ -20,13 +18,18 @@ def comments_only_in_2012_or_2013(comments: pd.DataFrame) -> pd.DataFrame:
 def separate_weekends_and_weekdays(data: pd.DataFrame):
     """
     @param data: a DataFrame containing the date, subreddit name, and comment count in each row
-    @return: two Series, where the first represents the comment counts of the comments made
-    on weekdays, and the second representing the comment counts of comments made on weekends
+    @return: two DataFrames, where the first represents the comment counts of the comments made
+    on weekdays, and the second represents the comment counts of comments made on weekends
     """
-    def get_weekday(date):
+    def get_day_of_week(date):
+        """
+        @param date: a date that a comment was posted
+        @return: the day of the week the comment was posted
+        """
         return date.weekday()
+
     cpy = data.copy()
-    is_weekday_comment = cpy['date'].apply(get_weekday) < 5
+    is_weekday_comment = cpy['date'].apply(get_day_of_week) < 5
     weekday_comments = cpy[is_weekday_comment]
     weekend_comments = cpy[~is_weekday_comment]
     return weekday_comments, weekend_comments
@@ -46,7 +49,7 @@ def valid_comments(comments: pd.DataFrame):
     )
 
 
-def get_normality_and_levene_value(weekday_comments: pd.Series, weekend_comments: pd.Series):
+def get_normality_and_levene_pvalue(weekday_comments: pd.Series, weekend_comments: pd.Series):
     """
     @param weekday_comments: a Series containing the comment counts of all comments made on
     weekdays
@@ -78,6 +81,11 @@ def mean_of_comment_counts(comments: pd.DataFrame) -> pd.Series:
 
 
 def ttest_pval(weekday_comments, weekend_comments):
+    """
+    @param weekday_comments: A Series containing the comment counts of all the comments made on a weekday
+    @param weekend_comments: A Series containing the comment counts of all the comments made on the weekend
+    @return: the p-value corresponding to the T-test done on weekday_comments and weekend_comments
+    """
     return stats.ttest_ind(weekday_comments, weekend_comments).pvalue
 
 OUTPUT_TEMPLATE = (
@@ -131,20 +139,17 @@ if not os.getenv('TESTING'):
     wkday_comments, wkend_comments = separate_weekends_and_weekdays(filtered_comments)
 
     wkday_comment_counts, wkend_comment_counts = wkday_comments['comment_count'], wkend_comments['comment_count']
-    original_data_statistics = (get_normality_and_levene_value(wkday_comment_counts, wkend_comment_counts) +
+
+    original_data_statistics = (get_normality_and_levene_pvalue(wkday_comment_counts, wkend_comment_counts) +
                                 (ttest_pval(wkday_comment_counts, wkend_comment_counts),))
 
-    transformed_wkday_counts, transformed_wkend_counts = np.sqrt(wkday_comment_counts), np.sqrt(wkend_comment_counts)
-    transformed_statistics = get_normality_and_levene_value(transformed_wkday_counts, transformed_wkend_counts )
+    transformed_statistics = get_normality_and_levene_pvalue(np.sqrt(wkday_comment_counts), np.sqrt(wkend_comment_counts))
 
-    wkday_averages, wkend_averages = mean_of_comment_counts(wkday_comments), mean_of_comment_counts(wkend_comments)
-    weekly_statistics = (get_normality_and_levene_value(wkday_averages, wkend_averages) +
+    wkday_averages, wkend_averages = map(mean_of_comment_counts, [wkday_comments, wkend_comments])
+
+    weekly_statistics = (get_normality_and_levene_pvalue(wkday_averages, wkend_averages) +
                          (ttest_pval(wkday_averages, wkend_averages),))
 
     whitney_pvalue = stats.mannwhitneyu(wkday_comment_counts, wkend_comment_counts).pvalue
 
     print_out_statistics(original_data_statistics, transformed_statistics, weekly_statistics, whitney_pvalue)
-
-    hist(transformed_wkday_counts)
-    hist(transformed_wkend_counts)
-    plt.show()

@@ -1,66 +1,73 @@
 First dataset:
-'x_mean': 8.71769618641382,
-'x_std': 12.15551723122202,
-'x_range': 57.87293327786024,
-'y_mean': 12.522874034702584,
-'y_std': 6.63996400756785,
-'y_range': 29.94924044421798,
-'correlation coefficient': 0.9503256954375483
-This dataset holds a collection of x and y values contains a strong positive correlation between them.
+x_mean: 8.71769618641382
+x_std: 12.15551723122202
+x_range: 57.87293327786024
+y_mean: 12.522874034702584
+y_std: 6.63996400756785
+y_range: 29.94924044421798
+correlation coefficient: 0.9503256954375483
+
+This dataset shows a strong positive correlation between the x and y values and has the majority of the data points
+concentrated in the middle.
 
 Second dataset:
-'x_mean': -0.7107871267159573,
-'x_std': 11.481583587790734,
-'x_range': 60.9181134493271,
-'y_mean': -0.7489869764497991,
-'y_std': 6.257917998755848,
-'y_range': 32.769118752736546,
-'correlation coefficient': 0.9551531665750373
+x_mean: -0.7107871267159573
+x_std: 11.481583587790734
+x_range: 60.9181134493271
+y_mean: -0.7489869764497991
+y_std: 6.257917998755848
+y_range: 32.769118752736546
+correlation coefficient: 0.9551531665750373
+
 This dataset has a strong positive correlation between the x and y values and has most of the data concentrated
 at (-9, 9) on the x-axis.
 
 Third dataset:
-'x_mean': 0.9689074904200939,
-'x_std': 2.235557861057969,
-'x_range': 6.967949247227911,
-'y_mean': 8.508535236641327,
-'y_std': 1.1493008110024525,
-'y_range': 3.9101365324125537,
-'correlation coefficient': 0.9819372646760659
+x_mean: 0.9689074904200939
+x_std: 2.235557861057969
+x_range: 6.967949247227911
+y_mean: 8.508535236641327
+y_std: 1.1493008110024525
+y_range: 3.9101365324125537
+correlation coefficient: 0.9819372646760659
+
 This dataset contains clusters of data spaced out by two units on the x-axis, with each cluster's
-y values being 0.5 +- the mean value of the cluster.
+y values being within 0.6 units from the mean value of the cluster.
 
 Fourth dataset:
-'x_mean': 49.90508614830509,
-'x_std': 28.50861051988193,
-'x_range': 87.3767,
-'y_mean': 18.553836525423726,
-'y_std': 16.545896442941682,
-'y_range': 44.56504,
-'correlation coefficient': -0.08119306735490815
-This dataset has an extremely weak linear relationship and has some of the data points spelling out SFU.
+x_mean: 49.90508614830509
+x_std: 28.50861051988193
+x_range: 87.3767
+y_mean: 18.553836525423726
+y_std: 16.545896442941682
+y_range: 44.56504
+correlation coefficient: -0.08119306735490815
+
+This dataset has an extremely weak linear relationship and has the shape of a rectangle with the words SFU spelt out
+within the rectangle.
 
 Fifth dataset:
-'x_mean': 49.90999357843095,
-'x_std': 28.500000943801354,
-'x_range': 86.71497088602307,
-'y_mean': 18.555524937729086,
-'y_std': 16.540796301840782,
-'y_range': 49.87869952875196,
-'correlation coefficient': -0.0882359898305888
-This dataset has an extremely weak negative correlation and the data can be separated into five distinct
+x_mean: 49.90999357843095
+x_std: 28.500000943801354
+x_range: 86.71497088602307
+y_mean: 18.555524937729086
+y_std: 16.540796301840782
+y_range: 49.87869952875196
+correlation coefficient: -0.0882359898305888
+
+The x and y values have an extremely weak negative correlation and the data can be separated into five distinct
 groups: those having an x-value in the range of 4 to 10 (inclusive); data having an x-value between 27 and 30,
 data having an x-value between 46 and 50, data having an x-value between 66 and 70, and data having an x-value between
 90 and 94.
 
 Sixth dataset:
-'x_mean': 7.21615517960992,
-'x_std': 11.921599067458311,
-'x_range': 59.735959663269966,
-'y_mean': 7.602215028237295,
-'y_std': 11.764382455006647,
-'y_range': 59.03623102785603,
-'correlation coefficient': 0.9350685662094905
+x_mean: 7.21615517960992
+x_std: 11.921599067458311
+x_range: 59.735959663269966
+y_mean: 7.602215028237295
+y_std: 11.764382455006647
+y_range: 59.03623102785603
+correlation coefficient: 0.9350685662094905
 
-This data shows an extremely positive linear relationship, with only two points that can not be mapped to the best
-fit line.
+This data shows an extremely positive linear relationship between x and y values, having few points that can not be
+mapped to the best fit line.
