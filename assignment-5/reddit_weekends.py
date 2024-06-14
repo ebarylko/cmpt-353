@@ -3,6 +3,7 @@ import os
 import sys
 from scipy import stats
 import numpy as np
+import collections
 
 
 def comments_only_in_2012_or_2013(comments: pd.DataFrame) -> pd.DataFrame:
@@ -13,6 +14,8 @@ def comments_only_in_2012_or_2013(comments: pd.DataFrame) -> pd.DataFrame:
     start = pd.Timestamp(2012, 1, 1)
     end = pd.Timestamp(2014, 1, 1)
     return comments.query('@start <= date < @end')
+
+
 
 
 def separate_weekends_and_weekdays(data: pd.DataFrame):
@@ -114,7 +117,7 @@ def print_out_statistics(initial_data_stats, transformed_data_stats, weekly_data
     """
     init_wkday_normality, init_wkend_normality, init_levene_val, init_ttest_val = initial_data_stats
     new_wkday_normality, new_wkend_normality, new_levene_val = transformed_data_stats
-    weekly_wkday_normality, weekly_wkend_normality, weekly_levene_val, weekly_ttest_val =  weekly_data_stats
+    weekly_wkday_normality, weekly_wkend_normality, weekly_levene_val, weekly_ttest_val = weekly_data_stats
 
     print(OUTPUT_TEMPLATE.format(
         initial_ttest_p=init_ttest_val,
