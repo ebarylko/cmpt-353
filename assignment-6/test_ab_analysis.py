@@ -1,6 +1,6 @@
 import ab_analysis as an
 import pandas as pd
-import pandas.testing as pdt
+import numpy.testing as npt
 
 sample_users = pd.DataFrame({"uid": [4, 2],
                              "is_instructor": [True, False],
@@ -19,10 +19,22 @@ sample_searches = pd.DataFrame({"uid": [1, 2, 3],
                                 "login_count": [1, 0, 9],
                                 "search_count": [2, 0, 4]})
 
-expected_table = pd.DataFrame({"searched_more_than_once": [0, 2],
-                               "never_searched": [1, 0]},
-                              index=["even_id", "odd_id"])
+expected_contigency_table = [(0, 2), (1, 0)]
 
 
-def test_prepare_contingency_table():
-    pdt.assert_frame_equal(an.prepare_contingency_table(sample_searches), expected_table)
+def test_prepare_search_usage_contingency_table():
+    assert an.prepare_search_usage_contingency_table(sample_searches) == expected_contigency_table
+
+
+sample_data = pd.DataFrame({"uid": [1, 2, 3],
+                            "is_instructor": [True, False, True],
+                            "login_count": [1, 0, 9],
+                            "search_count": [2, 0, 4]})
+
+
+even_id_searches, odd_id_searches = an.prepare_search_freq_contingency_table(sample_data)
+
+
+def test_prepare_search_freq_contingency_table():
+    npt.assert_array_equal(even_id_searches, [0])
+    npt.assert_array_equal(odd_id_searches, [2, 4])
