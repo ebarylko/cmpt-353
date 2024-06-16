@@ -1,4 +1,8 @@
 import pandas as pd
+import os
+import sys
+from scipy.stats import chi2_contingency
+from scipy.stats import mannwhitneyu
 
 
 def count_of_users_who_did_and_did_not_search(sample_users: pd.DataFrame):
@@ -39,7 +43,6 @@ def prepare_search_usage_contingency_table(searches: pd.DataFrame):
     the second representing the users with odd ids. Each row contains the number of users who
     searched more than once and the number of users who never searched
     """
-    has_even_id = searches['uid'] % 2 == 0
     users_with_even_ids, users_with_odd_ids = separate_users_with_odd_and_even_uid(searches)
 
     even_id_searches, odd_id_searches = map(count_of_users_who_did_and_did_not_search,
@@ -74,3 +77,18 @@ def prepare_search_freq_contingency_table(data: pd.DataFrame):
     users_with_even_ids, users_with_odd_ids = separate_users_with_odd_and_even_uid(data)
 
     return join_search_counts(users_with_even_ids, users_with_odd_ids)
+
+
+if not os.getenv('TESTING'):
+    file_name = sys.argv[1]
+    user_data = pd.read_json(file_name, lines=True, orient="records")
+
+    increased_usage_table = prepare_search_usage_contingency_table(user_data)
+    even_id_searches, odd_id_searches = prepare_search_freq_contingency_table(user_data)
+
+    # print(increased_frequency_table)
+    usage_pvalue = chi2_contingency(increased_usage_table).pvalue
+    frequency_pvalue = mannwhitneyu(even_id_searches, odd_id_searches).pvalue
+
+    print(usage_pvalue)
+    print(frequency_pvalue)
