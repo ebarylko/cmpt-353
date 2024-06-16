@@ -1,0 +1,18 @@
+1. The best function which changes the dataset in such a way that the new dataset
+satisfies the assumptions of a T-test is np.sqrt
+
+2. For the original dataset, rejecting the null hypothesis would mean that within the r/canada subreddit
+in 2012-2013, the average number of comments made on weekdays differ from the average number of comments made on weekends.
+For the transformed dataset, rejecting the null hypothesis has the same meaning as rejecting the null
+hypothesis with the original dataset. Since the square root function is monotonic, any conclusion about the
+transformed dataset would also hold for the original dataset. Therefore, concluding that the averages of the
+square roots of the weekday and weekend comment counts differ implies that the averages of the weekday and
+weekend comment counts also differ.
+
+3. I believe the best approach which answers the original question is transforming the data
+using np.sqrt. Compared with the other methods which answer an alternate question or
+give a dubious T-test p-value, transforming the data using np.sqrt gives the best of both
+worlds; the initial question answered by the data remains unchanged and the p-value of the
+T-test can be used with confidence.
+
+4. On average, the r/canada subreddit in the years 2012-2013 has more comments posted on weekdays than on weekends.
