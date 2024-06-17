@@ -1,6 +1,7 @@
 import ab_analysis as an
 import pandas as pd
 import numpy.testing as npt
+import pandas.testing as pdt
 
 sample_users = pd.DataFrame({"uid": [4, 2],
                              "is_instructor": [True, False],
@@ -38,3 +39,18 @@ even_id_searches, odd_id_searches = an.prepare_search_freq_contingency_table(sam
 def test_prepare_search_freq_contingency_table():
     npt.assert_array_equal(even_id_searches, [0])
     npt.assert_array_equal(odd_id_searches, [2, 4])
+
+
+mixed_users = pd.DataFrame({"uid": [1, 2, 3],
+                            "is_instructor": [True, False, False],
+                            "login_count": [1, 0, 9],
+                            "search_count": [2, 0, 4]})
+
+expected_teachers = pd.DataFrame({"uid": [1],
+                                  "is_instructor": [True],
+                                  "login_count": [1],
+                                  "search_count": [2]})
+
+
+def test_get_teachers():
+    pdt.assert_frame_equal(an.get_teachers(mixed_users), expected_teachers)

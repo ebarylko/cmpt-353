@@ -79,16 +79,60 @@ def prepare_search_freq_contingency_table(data: pd.DataFrame):
     return join_search_counts(users_with_even_ids, users_with_odd_ids)
 
 
+def get_teachers(users: pd.DataFrame) -> pd.DataFrame:
+    """
+    @param users: a DataFrame where each row contains a user id, boolean value indicating
+    if the user is a teacher, the number of times a user logged in, and the number of times the
+    user searched
+    @return: a DataFrame only containing the users who are teachers
+    """
+    is_teacher = users['is_instructor']
+    return users[is_teacher]
+
+
+
+def usage_and_freq_pvalue(data: pd.DataFrame):
+    """
+    @param data: a DataFrame where each row contains a user id, boolean value indicating
+    if the user is a teacher, the number of times a user logged in, and the number of times the
+    user searched
+    @return: the p-value of the chi squared test and the Mann-Whitney U-test
+    """
+    increased_usage_table = prepare_search_usage_contingency_table(data)
+    even_id_searches, odd_id_searches = prepare_search_freq_contingency_table(data)
+
+    usage_pvalue = chi2_contingency(increased_usage_table).pvalue
+    frequency_pvalue = mannwhitneyu(even_id_searches, odd_id_searches).pvalue
+    return usage_pvalue, frequency_pvalue
+
+
+OUTPUT_TEMPLATE = (
+    '"Did more/less users use the search feature?" p-value:  {0:.3g}\n'
+    '"Did users search more/less?" p-value:  {1:.3g} \n'
+    '"Did more/less instructors use the search feature?" p-value:  {2:.3g}\n'
+    '"Did instructors search more/less?" p-value:  {3:.3g}'
+)
+
+
+def print_pvalues(original_data_pvalues, modified_data_pvalues):
+    normal_chi_squared_pvalue, normal_mann_whitney_u_pvalue = original_data_pvalues
+    modified_chi_squared_pvalue, modified_mann_whitney_u_pvalue = modified_data_pvalues
+
+    print(OUTPUT_TEMPLATE.format(
+        normal_chi_squared_pvalue,
+        normal_mann_whitney_u_pvalue,
+        modified_chi_squared_pvalue,
+        modified_mann_whitney_u_pvalue
+    ))
+
+
 if not os.getenv('TESTING'):
     file_name = sys.argv[1]
     user_data = pd.read_json(file_name, lines=True, orient="records")
+    normal_data_pvalues = usage_and_freq_pvalue(user_data)
 
-    increased_usage_table = prepare_search_usage_contingency_table(user_data)
-    even_id_searches, odd_id_searches = prepare_search_freq_contingency_table(user_data)
+    only_teachers = get_teachers(user_data)
+    teacher_data_pvalues = usage_and_freq_pvalue(only_teachers)
 
-    # print(increased_frequency_table)
-    usage_pvalue = chi2_contingency(increased_usage_table).pvalue
-    frequency_pvalue = mannwhitneyu(even_id_searches, odd_id_searches).pvalue
+    print_pvalues(normal_data_pvalues, teacher_data_pvalues)
 
-    print(usage_pvalue)
-    print(frequency_pvalue)
