@@ -74,6 +74,4 @@ if not os.getenv("TESTING"):
     function_runtimes = all_runtimes(all_datasets, all_implementations)
     columns = map(get_func_name, all_implementations)
     runtime_chart = prepare_runtime_chart(function_runtimes, columns)
-    print(runtime_chart)
-
-# print(list(all_runtimes(generate_datasets(10), all_implementations)))
+    runtime_chart.to_csv("data.csv", index=False)

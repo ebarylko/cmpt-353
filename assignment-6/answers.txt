@@ -1,0 +1,16 @@
+1. For me, the steps we take to analyze the data do not involve
+p-hacking since we have only redefined our original hypothesis
+to look at the proportion of the population most impacted by
+the search feature. Using an alpha value of 0.05 for this
+test seems reasonable.
+
+2. If we had run a T-test between every pair of wall time averages for the sorting algorithms, we would
+have 7c2 = 21 T-tests. Since each T-test has an alpha value of 0.05, we have a probability of
+0.95^21 = 0.3406 of all the tests not reporting a false positive. The probability of each
+test not reporting a false positive would be 1 - 0.3406 = 0.6594.
+
+3. The sorting algorithms, ranked from slowest to fastest, are listed below, with  a > b indicating
+that algorithm a takes on average longer than algorithm b.
+qs4 > merge1 > qs5 > qs1 > partition_sort.
+qs2 and qs3 could not be ordered and are therefore not included in this list.
+
