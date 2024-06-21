@@ -20,11 +20,11 @@ sample_searches = pd.DataFrame({"uid": [1, 2, 3],
                                 "login_count": [1, 0, 9],
                                 "search_count": [2, 0, 4]})
 
-expected_contigency_table = [(0, 2), (1, 0)]
+expected_contingency_table = [(0, 2), (1, 0)]
 
 
 def test_prepare_search_usage_contingency_table():
-    assert an.prepare_search_usage_contingency_table(sample_searches) == expected_contigency_table
+    assert an.prepare_search_usage_contingency_table(sample_searches) == expected_contingency_table
 
 
 sample_data = pd.DataFrame({"uid": [1, 2, 3],
