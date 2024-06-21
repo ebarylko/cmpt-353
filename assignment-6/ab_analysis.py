@@ -1,31 +1,30 @@
 import pandas as pd
 import os
 import sys
-from scipy.stats import chi2_contingency
-from scipy.stats import mannwhitneyu
+from scipy.stats import chi2_contingency, mannwhitneyu
 
 
-def count_of_users_who_did_and_did_not_search(sample_users: pd.DataFrame):
+def count_of_users_who_did_and_did_not_search(users: pd.DataFrame):
     """
-    @param sample_users: a DataFrame where each row contains a user id, boolean value indicating
-    if the user is a teacher, the number of times a user logged in, and the number of times the
+    @param users: a DataFrame where each row contains a user id, a boolean value indicating
+    if the user is a teacher, the number of times the user logged in, and the number of times the
     user searched
     @return: a collection which contains the number of users who used the search function and
     the number of users who never searched
     """
-    has_never_searched = sample_users['search_count'] < 1
-    searched_more_than_once = sample_users[~has_never_searched]
-    never_searched = sample_users[has_never_searched]
-    return searched_more_than_once.index.size, never_searched.index.size
+    has_never_searched = users['search_count'] < 1
+    users_who_searched = users[~has_never_searched]
+    users_who_never_searched = users[has_never_searched]
+    return users_who_searched.index.size, users_who_never_searched.index.size
 
 
 def separate_users_with_odd_and_even_uid(data: pd.DataFrame):
     """
-    @param data: a DataFrame where each row contains a user id, boolean value indicating
+    @param data: a DataFrame where each row contains a user id, a boolean value indicating
     if the user is a teacher, the number of times a user logged in, and the number of times the
     user searched
-    @return: two DataFrames, where the first has all the users with an even user id, and the second
-    has all the users containing odd user ids
+    @return: two DataFrames, where the first has all the users with an even user id and the second
+    has all the users with an odd user id
     """
     data_cpy = data.copy()
     has_even_id = data_cpy['uid'] % 2 == 0
@@ -36,9 +35,9 @@ def separate_users_with_odd_and_even_uid(data: pd.DataFrame):
 
 def prepare_search_usage_contingency_table(searches: pd.DataFrame):
     """
-    @param searches: a DataFrame where each row contains a user id, boolean value indicating
+    @param searches: a DataFrame where each row contains a user id, a boolean value indicating
     if the user is a teacher, the number of times a user logged in, and the number of times the
-    user searched
+    user used the search feature
     @return: a collection containing two rows, the first representing the users with even ids and
     the second representing the users with odd ids. Each row contains the number of users who
     searched more than once and the number of users who never searched
@@ -90,13 +89,13 @@ def get_teachers(users: pd.DataFrame) -> pd.DataFrame:
     return users[is_teacher]
 
 
-
 def usage_and_freq_pvalue(data: pd.DataFrame):
     """
-    @param data: a DataFrame where each row contains a user id, boolean value indicating
+    @param data: a DataFrame where each row contains a user id, a boolean value indicating
     if the user is a teacher, the number of times a user logged in, and the number of times the
-    user searched
-    @return: the p-value of the chi squared test and the Mann-Whitney U-test
+    user used the search feature
+    @return: the p-value of the chi squared test testing if more users engaged with the search feature
+    and the p-value of the Mann-Whitney U-test checking if the search feature was used more frequently
     """
     increased_usage_table = prepare_search_usage_contingency_table(data)
     even_id_searches, odd_id_searches = prepare_search_freq_contingency_table(data)
