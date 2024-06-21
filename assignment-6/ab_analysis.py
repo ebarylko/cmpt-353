@@ -60,6 +60,11 @@ def prepare_search_freq_contingency_table(data: pd.DataFrame):
     odd ids used the search feature
     """
     def get_search_counts(df: pd.DataFrame):
+        """
+        @param df: a DataFrame containing users and the number of times they
+        used the search feature
+        @return: the number of times each user used the search feature
+        """
         return df['search_count'].to_numpy(copy=True)
 
     users_with_even_ids, users_with_odd_ids = separate_users_with_odd_and_even_uid(data)
@@ -68,13 +73,12 @@ def prepare_search_freq_contingency_table(data: pd.DataFrame):
 
 def get_teachers(users: pd.DataFrame) -> pd.DataFrame:
     """
-    @param users: a DataFrame where each row contains a user id, boolean value indicating
+    @param users: a DataFrame where each row contains a user id, a boolean value indicating
     if the user is a teacher, the number of times a user logged in, and the number of times the
     user searched
     @return: a DataFrame only containing the users who are teachers
     """
-    is_teacher = users['is_instructor']
-    return users[is_teacher]
+    return users.query('is_instructor == True')
 
 
 def usage_and_freq_pvalue(data: pd.DataFrame):
