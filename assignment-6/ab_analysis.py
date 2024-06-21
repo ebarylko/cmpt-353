@@ -106,6 +106,14 @@ OUTPUT_TEMPLATE = (
 
 
 def print_pvalues(original_data_pvalues, modified_data_pvalues):
+    """
+    @param original_data_pvalues: the pvalues of the chi squared and Mann Whitney U tests on
+    all the users
+    @param modified_data_pvalues: the pvalues of the chi squared and Mann Whitney U tests on
+    the teachers
+    @return: prints the pvalues obtained from the original set of users and the set of users
+    who are teachers
+    """
     normal_chi_squared_pvalue, normal_mann_whitney_u_pvalue = original_data_pvalues
     modified_chi_squared_pvalue, modified_mann_whitney_u_pvalue = modified_data_pvalues
 

@@ -4,7 +4,6 @@ from numpy.random import default_rng
 import pandas as pd
 import functools as ft
 import os
-from operator import methodcaller
 
 
 def generate_datasets(num):
@@ -42,9 +41,8 @@ def get_runtimes(datasets, f):
 def all_runtimes(datasets, sorting_funcs):
     """
     @param datasets: a collection of datasets where each one contains a large number of random integers
-    @param f: the sorting function to use on each dataset
     @param sorting_funcs: the sorting functions to benchmark
-    @return: a collection of collections, where each subcollection details the runtimes of a specific funtions
+    @return: a collection of collections, where each subcollection contains the runtimes of a specific function
     on each of the datasets
     """
     runtimes = ft.partial(get_runtimes, datasets)
@@ -53,11 +51,11 @@ def all_runtimes(datasets, sorting_funcs):
 
 def prepare_runtime_chart(runtimes, column_names) -> pd.DataFrame:
     """
-    @param runtimes: a collection of collections, where each one contains the runtimes of the algorithms
-    over the provided datasets
-    @param column_names: the name of the functions used on the algorithms
-    @return: a DataFrame where each column has the runtimes of a single algorithm on the provided datasets,
-    and each column has the name of one of the provided datasets
+    @param runtimes: a collection of collections, where each one contains the runtimes of a specific sorting
+    algorithm over the provided datasets
+    @param column_names: the name of the sorting functions used on the algorithms
+    @return: a DataFrame where each row has the name of one of the provided datasets and each column
+    has the runtimes of a single sorting algorithm on the provided datasets
     """
     function_names_and_runtimes = dict(zip(column_names, runtimes))
     number_of_datasets = len(runtimes[0])
