@@ -12,7 +12,7 @@ def generate_datasets(num):
     @return: {num} number of datasets filled with random integers from -10,000 to 10,000
     """
     seed = default_rng()
-    return [seed.integers(-70000, high=70000, size=23000) for i in range(num)]
+    return [seed.integers(-70000, high=70000, size=21000) for i in range(num)]
 
 
 def get_runtime(f, dataset):
