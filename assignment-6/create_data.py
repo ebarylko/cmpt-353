@@ -68,7 +68,7 @@ def get_func_name(f):
 
 
 if not os.getenv("TESTING"):
-    all_datasets = generate_datasets(50)
+    all_datasets = generate_datasets(60)
     function_runtimes = all_runtimes(all_datasets, all_implementations)
     columns = map(get_func_name, all_implementations)
     runtime_chart = prepare_runtime_chart(function_runtimes, columns)
