@@ -7,6 +7,6 @@ have 7c2 = 21 T-tests. Since there is a 95% probability of not committing a type
 a probability of 0.95^21 = 0.3406 of all the tests not reporting a false positive. The probability of at least one
 test reporting a false positive would be 1 - 0.3406 = 0.6594.
 
-3. The sorting algorithms, ranked from slowest to fastest, are qs4, merge1, qs5, qs1, and partition_sort.
-Algorithms qs2 and qs3 could not be ordered and are therefore not included in the ordering above.
+3. The sorting algorithms, ranked from slowest to fastest, are merge1, qs4, qs1, and partition_sort.
+Algorithms qs2, qs3, and qs5 could not be ordered and are therefore not included in the ordering above.
 
