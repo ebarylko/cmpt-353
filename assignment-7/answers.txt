@@ -1,2 +1,6 @@
 1. I do not think the residuals are normal looking enough, and therefore must not confide in the result by the
 OLS.
+
+2. I believe the new prediction is causing the Kalman filter to overfit the data. Could this be since we are using
+a linear regression and not a polynomial regression? Could it be because the type of regression for this data
+is not a linear regression?
