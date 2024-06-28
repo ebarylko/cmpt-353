@@ -13,10 +13,11 @@ from skimage.color import lab2rgb
 
 def normalized_rgb_values_and_colors(data: pd.DataFrame):
     """
-    @param data: a DataFrame where each row contains the R, G, and B value of a color, a guess for the name of the color
-    corresponding to the RGB values, and an indication of how accurate the guess is
-    @return: two numpy arrays, one containing the normalized RGB values and the other containing the guesses for the
-    colors
+    @param data: a DataFrame where each row contains the R, G, and B value of a color,
+     a guess for the name of the color corresponding to the RGB values, and an indication of how
+     accurate the guess is
+    @return: two numpy arrays, one containing the normalized RGB values and the other containing the
+    guesses for the colors
     """
     cpy = data.copy()
     colors = cpy['Label']
@@ -83,21 +84,40 @@ def plot_predictions(model, lum=67, resolution=300):
     plt.imshow(pixels)
 
 
-lab_color_model = make_pipeline(FunctionTransformer(rgb2lab),
-                                GaussianNB())
+def generate_lab_model():
+    """
+    @return: a naive Bayes model trained on color values in LAB space
+    """
+    return make_pipeline(FunctionTransformer(rgb2lab),
+                         GaussianNB())
+
+
+def print_model_validation_scores(rgb_score, lab_score):
+    """
+    @param rgb_score: the score of the RGB model when applied on the validation dataset
+    @param lab_score: the score of the LAB model when applied on the validation dataset
+    @return: prints out the scores of the RGB AND LAB models on their respective validation datasets
+    """
+    print("RGB model validation score:", rgb_score)
+    print("LAB model validation score:", lab_score)
+
 
 if not os.getenv('TESTING'):
     file_name = sys.argv[1]
     color_data = pd.read_csv(file_name)
 
     normalized_rgb_values, colors = normalized_rgb_values_and_colors(color_data)
-    training_rgb_values, validation_rgb_values, training_colors, validation_colors = train_test_split(normalized_rgb_values,
-                                                                                                      colors)
-    model = GaussianNB()
-    model.fit(training_rgb_values, training_colors)
+    (training_rgb_values, validation_rgb_values,
+     training_colors, validation_colors) = train_test_split(normalized_rgb_values,
+                                                            colors)
+    rgb_model = GaussianNB()
+    rgb_model.fit(training_rgb_values, training_colors)
+
+    lab_color_model = generate_lab_model()
     lab_color_model.fit(training_rgb_values, training_colors)
-    print(model.score(validation_rgb_values, validation_colors))
-    print(lab_color_model.score(validation_rgb_values, validation_colors))
-    plot_predictions(model)
-    plot_predictions(lab_color_model)
-    # plt.show()
+
+    rgb_validation_score = rgb_model.score(validation_rgb_values, validation_colors)
+    lab_validation_score = lab_color_model.score(validation_rgb_values, validation_colors)
+
+    print_model_validation_scores(rgb_validation_score, lab_validation_score)
+

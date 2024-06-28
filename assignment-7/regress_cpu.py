@@ -29,16 +29,16 @@ def add_next_temperature(data: pd.DataFrame) -> pd.DataFrame:
     return data.assign(next_temp=get_following_temperatures(temps)).dropna()
 
 
-def model_and_coefficients(X_data: pd.DataFrame, y_data: pd.Series):
+def model_and_coefficients(training_df: pd.DataFrame, y_data: pd.Series):
     """
-    @param X_data: A DataFrame containing the data used to train the model
-    @param y_data: A Series containing the y values associated with the data in X_data
-    @return: a linear regression model trained on X_data and y_data and the coefficients
-    for the values in X_data
+    @param training_df: A DataFrame containing the data used to train the model
+    @param y_data: A Series containing the y values associated with the data in training_df
+    @return: a pair of items, the first being the linear regression model trained on the data in
+    training_df and y_data, and the second being the coefficients for the values in training_df
     """
-    model = LinearRegression(fit_intercept=False)
-    model.fit(X_data, y_data)
-    return model, model.coef_
+    mod = LinearRegression(fit_intercept=False)
+    mod.fit(training_df, y_data)
+    return mod, mod.coef_
 
 
 def read_file(filename: str) -> pd.DataFrame:
@@ -92,9 +92,9 @@ if not getenv('TESTING'):
     training_file = argv[1]
     validation_file = argv[2]
 
-    training_data, validation_data = map(read_file, [training_file, validation_file])
+    training_data, _ = map(read_file, [training_file, validation_file])
 
-    complete_training_data, complete_validation_data = map(add_next_temperature, [training_data, validation_data])
+    complete_training_data = add_next_temperature(training_data)
 
     X_train, y_train = complete_training_data[X_columns], complete_training_data[y_column]
 
