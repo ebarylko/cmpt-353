@@ -87,20 +87,16 @@ def plot_errors(model, X_valid, y_valid):
     savefig('test_errors.png')
     close()
 
+
 if not getenv('TESTING'):
     training_file = argv[1]
     validation_file = argv[2]
+
     training_data, validation_data = map(read_file, [training_file, validation_file])
+
     complete_training_data, complete_validation_data = map(add_next_temperature, [training_data, validation_data])
+
     X_train, y_train = complete_training_data[X_columns], complete_training_data[y_column]
-    X_valid, y_valid = complete_validation_data[X_columns], complete_validation_data[y_column]
 
     model, coefficients = model_and_coefficients(X_train, y_train)
     output_regression(coefficients)
-
-    smooth_test([coefficients], complete_training_data, 'train.png')
-    smooth_test([coefficients], complete_validation_data, 'valid.png')
-    plot_errors(model, X_valid, y_valid)
-
-
-    print(f"Training score: {model.score(X_train, y_train)}\nValidation score: {model.score(X_valid, y_valid)}")
