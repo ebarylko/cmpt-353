@@ -98,8 +98,6 @@ def print_model_validation_scores(rgb_score, lab_score):
     @param lab_score: the score of the LAB model when applied on the validation dataset
     @return: prints out the scores of the RGB AND LAB models on their respective validation datasets
     """
-    print("RGB model validation score:", rgb_score)
-    print("LAB model validation score:", lab_score)
 
 
 if not os.getenv('TESTING'):
@@ -119,5 +117,6 @@ if not os.getenv('TESTING'):
     rgb_validation_score = rgb_model.score(validation_rgb_values, validation_colors)
     lab_validation_score = lab_color_model.score(validation_rgb_values, validation_colors)
 
-    print_model_validation_scores(rgb_validation_score, lab_validation_score)
+    print("RGB model validation score:", rgb_validation_score)
+    print("LAB model validation score:", lab_validation_score)
 

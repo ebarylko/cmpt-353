@@ -45,11 +45,6 @@ def read_file(filename: str) -> pd.DataFrame:
     return pd.read_csv(filename, parse_dates=['timestamp'])
 
 
-def output_regression(coefficients):
-    regress = ' + '.join(f'{coef:.3}*{col}' for col, coef in zip(X_columns, coefficients))
-    print(f'next_temp = {regress}')
-
-
 def smooth_test(coef, sysinfo, outfile):
     X_valid, y_valid = sysinfo[X_columns], sysinfo[y_column]
 
@@ -99,4 +94,6 @@ if not getenv('TESTING'):
     X_train, y_train = complete_training_data[X_columns], complete_training_data[y_column]
 
     model, coefficients = model_and_coefficients(X_train, y_train)
-    output_regression(coefficients)
+
+    regress = ' + '.join(f'{coef:.3}*{col}' for col, coef in zip(X_columns, coefficients))
+    print(f'next_temp = {regress}')
