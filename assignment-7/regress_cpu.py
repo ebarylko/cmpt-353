@@ -2,10 +2,6 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from os import getenv
 from sys import argv
-import numpy as np
-from matplotlib.pyplot import plot, figure, savefig, close, hist
-from pykalman import KalmanFilter
-
 
 X_columns = ['temperature', 'cpu_percent', 'fan_rpm', 'sys_load_1', 'cpu_freq']
 y_column = 'next_temp'
@@ -43,44 +39,6 @@ def model_and_coefficients(training_df: pd.DataFrame, y_data: pd.Series):
 
 def read_file(filename: str) -> pd.DataFrame:
     return pd.read_csv(filename, parse_dates=['timestamp'])
-
-
-def smooth_test(coef, sysinfo, outfile):
-    X_valid, y_valid = sysinfo[X_columns], sysinfo[y_column]
-
-    # feel free to tweak these if you think it helps.
-    transition_stddev = 0.4
-    observation_stddev = 1.1
-
-    dims = X_valid.shape[-1]
-    initial = X_valid.iloc[0]
-    observation_covariance = np.diag([observation_stddev, 2, 2, 1, 10]) ** 2
-    transition_covariance = np.diag([transition_stddev, 80, 100, 10, 100]) ** 2
-
-    init_transition = np.eye(4, 5, k=1)
-    transition = np.concatenate((coef, init_transition), axis=0)
-
-    kf = KalmanFilter(
-        initial_state_mean=initial,
-        initial_state_covariance=observation_covariance,
-        observation_covariance=observation_covariance,
-        transition_covariance=transition_covariance,
-        transition_matrices=transition,
-    )
-
-    kalman_smoothed, _ = kf.smooth(X_valid)
-
-    figure(figsize=(15, 6))
-    plot(sysinfo['timestamp'], sysinfo['temperature'], 'b.', alpha=0.5)
-    plot(sysinfo['timestamp'], kalman_smoothed[:, 0], 'g-')
-    savefig(outfile)
-    close()
-
-def plot_errors(model, X_valid, y_valid):
-    residuals = y_valid - model.predict(X_valid)
-    hist(residuals, bins=100)
-    savefig('test_errors.png')
-    close()
 
 
 if not getenv('TESTING'):
