@@ -1,0 +1,10 @@
+1. Looking at the histogram of the residuals, the graph appears to not deviate largely from
+a normal distribution. Considering this and the fact there are more than forty data points,
+ I believe looking at the OLS p-value has merit. Regarding whether the ratings are increasing, seeing that
+ the p-value from the OLS is lower than 0.05 and the best fit line demonstrates a positive correlation between time
+ and ratings, I can conclude that the ratings are increasing.
+
+2. I believe the coefficients used in the first row of the transition matrix of the Kalman filter
+aid in capturing the true signal. The Kalman filter configured with these coefficients
+appears to be avoiding extreme outliers created by the noise, obtaining data which is closer to
+the true signal.
