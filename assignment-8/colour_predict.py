@@ -98,7 +98,7 @@ if not os.getenv('TESTING'):
                                                             colors)
 
     rgb_and_lab_models = chain.from_iterable(map(create_both_models,
-                                                 [GaussianNB(), KNeighborsClassifier(n_neighbors=14), DecisionTreeClassifier(max_depth=3)]
+                                                 [GaussianNB(), KNeighborsClassifier(n_neighbors=14), DecisionTreeClassifier(max_depth=9)]
                                                  ))
 
     fit_and_score = partial(train_and_evaluate_model,
