@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import make_pipeline
 from skimage.color import rgb2lab
 from functools import partial
@@ -77,16 +77,6 @@ def train_and_evaluate_model(training_data, validation_data, model):
     return model.score(*validation_data)
 
 
-# def get_validation_data_score(validation_data, model):
-#     """
-#     @param validation_data: the data used to validate the model
-#     @param model: the model to be used
-#     @return: the score of the model's predictions on the validation data
-#     """
-#     print(model)
-#     # print(model.score(*validation_data))
-#     return model.score(*validation_data)
-#
 if not os.getenv('TESTING'):
 
     file_name = sys.argv[1]
@@ -98,7 +88,9 @@ if not os.getenv('TESTING'):
                                                             colors)
 
     rgb_and_lab_models = chain.from_iterable(map(create_both_models,
-                                                 [GaussianNB(), KNeighborsClassifier(n_neighbors=14), DecisionTreeClassifier(max_depth=9)]
+                                                 [GaussianNB(),
+                                                  KNeighborsClassifier(n_neighbors=14),
+                                                  RandomForestClassifier(n_estimators=120)]
                                                  ))
 
     fit_and_score = partial(train_and_evaluate_model,
@@ -106,14 +98,13 @@ if not os.getenv('TESTING'):
                             (validation_rgb_values, validation_colors))
 
     naive_rgb_score, naive_lab_score, neighbours_rgb_score, \
-        neighbours_lab_score, tree_rgb_score, tree_lab_score = map(fit_and_score, rgb_and_lab_models)
+        neighbours_lab_score, forest_rgb_score, forest_lab_score = map(fit_and_score, rgb_and_lab_models)
 
     print(OUTPUT_TEMPLATE.format(
         bayes_rgb=naive_rgb_score,
         bayes_convert=naive_lab_score,
         knn_rgb=neighbours_rgb_score,
         knn_convert=neighbours_lab_score,
-        rf_rgb=tree_rgb_score,
-        # rf_convert=forest_lab_model.score(training_rgb_values, training_colors)
-        rf_convert=tree_lab_score,
+        rf_rgb=forest_rgb_score,
+        rf_convert=forest_lab_score,
     ))
