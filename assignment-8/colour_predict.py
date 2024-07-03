@@ -63,8 +63,8 @@ def create_both_models(model):
     @return: two instances of the model, one to be used on RGB values and the other to be used on
     LAB colors
     """
-    return model(), make_pipeline(FunctionTransformer(rgb2lab),
-                                  model())
+    return model, make_pipeline(FunctionTransformer(rgb2lab),
+                                model)
 
 def train_and_evaluate_model(training_data, validation_data, model):
     """
@@ -98,12 +98,12 @@ if not os.getenv('TESTING'):
                                                             colors)
 
     rgb_and_lab_models = chain.from_iterable(map(create_both_models,
-                                                 [GaussianNB, KNeighborsClassifier, DecisionTreeClassifier]
+                                                 [GaussianNB(), KNeighborsClassifier(n_neighbors=14), DecisionTreeClassifier(max_depth=3)]
                                                  ))
 
     fit_and_score = partial(train_and_evaluate_model,
-                       (training_rgb_values, training_colors),
-                       (validation_rgb_values, validation_colors))
+                            (training_rgb_values, training_colors),
+                            (validation_rgb_values, validation_colors))
 
     naive_rgb_score, naive_lab_score, neighbours_rgb_score, \
         neighbours_lab_score, tree_rgb_score, tree_lab_score = map(fit_and_score, rgb_and_lab_models)
