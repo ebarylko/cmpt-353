@@ -26,30 +26,6 @@ def normalized_rgb_values_and_colors(data: pd.DataFrame):
     return rgb_values.to_numpy(), colors.to_numpy()
 
 
-def generate_bayes_lab_model():
-    """
-    @return: a naive Bayes model trained on color values in LAB space
-    """
-    return make_pipeline(FunctionTransformer(rgb2lab),
-                         GaussianNB())
-
-
-def gen_neighbours_lab_model():
-    """
-    @return: a k nearest neighbours model trained on color values in LAB space
-    """
-    return make_pipeline(FunctionTransformer(rgb2lab),
-                         KNeighborsClassifier())
-
-
-def gen_decision_tree_lab_model():
-    """
-    @return: a k nearest neighbours model trained on color values in LAB space
-    """
-    return make_pipeline(FunctionTransformer(rgb2lab),
-                         DecisionTreeClassifier())
-
-
 OUTPUT_TEMPLATE = (
     'Bayesian classifier:     {bayes_rgb:.3f}  {bayes_convert:.3f}\n'
     'kNN classifier:          {knn_rgb:.3f}  {knn_convert:.3f}\n'
@@ -65,6 +41,7 @@ def create_both_models(model):
     """
     return model, make_pipeline(FunctionTransformer(rgb2lab),
                                 model)
+
 
 def train_and_evaluate_model(training_data, validation_data, model):
     """

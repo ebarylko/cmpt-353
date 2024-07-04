@@ -5,11 +5,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
 
-model = make_pipeline(
-    MinMaxScaler(),
-    RandomForestClassifier()
-)
-
 
 def split_data(data: pd.DataFrame, columns_to_split_on):
     """
@@ -25,12 +20,17 @@ def split_data(data: pd.DataFrame, columns_to_split_on):
     return data_associated_with_columns, data_not_associated_with_columns
 
 
+model = make_pipeline(
+    MinMaxScaler(),
+    RandomForestClassifier()
+)
 
-# if not getenv('TESTING'):
-#     labelled_file_name = argv[1]
-#
-#     labelled_data = pd.read_csv(labelled_file_name)
-#
-#     months_and_weather, cities = split_data(labelled_data, ['city'])
-#     print(labelled_data)
-#
+
+if not getenv('TESTING'):
+    labelled_file_name = argv[1]
+
+    labelled_data = pd.read_csv(labelled_file_name)
+
+    cities, weather_data = split_data(labelled_data, ['city'])
+
+    model.fit(weather_data, cities)
