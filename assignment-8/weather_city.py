@@ -36,6 +36,10 @@ def read_unlabelled_data(filename: str) -> pd.DataFrame:
     return data.drop('city', axis='columns')
 
 
+def save_predictions_to_file(predictions, file_name: str):
+    pd.Series(predictions).to_csv(file_to_save_to, index=False, header=False)
+
+
 if not getenv('TESTING'):
     labelled_file_name = argv[1]
 
@@ -55,8 +59,8 @@ if not getenv('TESTING'):
 
     unlabelled_data = read_unlabelled_data(unlabelled_file_name)
 
-    predictions = model.predict(unlabelled_data)
+    city_predictions = model.predict(unlabelled_data)
 
     file_to_save_to = argv[3]
 
-    pd.Series(predictions).to_csv(file_to_save_to, index=False, header=False)
+    save_predictions_to_file(city_predictions, file_to_save_to)
