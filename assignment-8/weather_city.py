@@ -27,6 +27,15 @@ model = make_pipeline(
 )
 
 
+def read_unlabelled_data(filename: str) -> pd.DataFrame:
+    """
+    @param filename: the name of the file containing the unlabelled data
+    @return: the data within the file as a DataFrame, excluding the cities column
+    """
+    data = pd.read_csv(filename)
+    return data.drop('city', axis='columns')
+
+
 if not getenv('TESTING'):
     labelled_file_name = argv[1]
 
@@ -40,3 +49,11 @@ if not getenv('TESTING'):
     model.fit(training_weather_data, training_cities)
 
     print(model.score(validation_weather_data, validation_cities))
+
+    unlabelled_file_name = argv[2]
+
+    unlabelled_data = read_unlabelled_data(unlabelled_file_name)
+
+    predictions = model.predict(unlabelled_data)
+    
+    print(predictions)
