@@ -33,7 +33,7 @@ OUTPUT_TEMPLATE = (
 )
 
 
-def create_both_models(model):
+def create_rgb_and_lab_models(model):
     """
     @param model: a machine learning model
     @return: two instances of the model, one to be used on RGB values and the other to be used on
@@ -48,7 +48,7 @@ def train_and_evaluate_model(training_data, validation_data, model):
     @param training_data: the data used to train the model
     @param validation_data: the data used to validate the model
     @param model: the model to be trained
-    @return: trains the model using training_data and evaluates it using the validation_data
+    @return: trains the model using training_data and evaluates it using validation_data
     """
     model.fit(*training_data)
     return model.score(*validation_data)
@@ -60,14 +60,14 @@ if not os.getenv('TESTING'):
     color_data = pd.read_csv(file_name)
 
     normalized_rgb_values, colors = normalized_rgb_values_and_colors(color_data)
+
     (training_rgb_values, validation_rgb_values,
      training_colors, validation_colors) = train_test_split(normalized_rgb_values,
                                                             colors)
 
-    rgb_and_lab_models = chain.from_iterable(map(create_both_models,
-                                                 [GaussianNB(),
-                                                  KNeighborsClassifier(n_neighbors=14),
-                                                  RandomForestClassifier(n_estimators=120)]
+    rgb_and_lab_models = chain.from_iterable(map(create_rgb_and_lab_models, [GaussianNB(),
+                                                                             KNeighborsClassifier(n_neighbors=14),
+                                                                             RandomForestClassifier(n_estimators=120)]
                                                  ))
 
     fit_and_score = partial(train_and_evaluate_model,
