@@ -48,12 +48,15 @@ if not getenv('TESTING'):
 
     model.fit(training_weather_data, training_cities)
 
-    print(model.score(validation_weather_data, validation_cities))
+    print("The accuracy of the model on the validation data is",
+          model.score(validation_weather_data, validation_cities))
 
     unlabelled_file_name = argv[2]
 
     unlabelled_data = read_unlabelled_data(unlabelled_file_name)
 
     predictions = model.predict(unlabelled_data)
-    
-    print(predictions)
+
+    file_to_save_to = argv[3]
+
+    pd.Series(predictions).to_csv(file_to_save_to, index=False, header=False)
