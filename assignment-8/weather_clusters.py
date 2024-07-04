@@ -6,6 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
 
 def split_data(data: pd.DataFrame, columns_to_split_on):
@@ -61,10 +62,7 @@ if not getenv('TESTING'):
     plt.scatter(data_with_only_two_features[:, 0], data_with_only_two_features[:, 1], c=clustered_data, cmap='Set1', edgecolor='k', s=30)
     plt.savefig('clusters.png')
 
-
-    # print(df['city'])
-    # print(df['cluster'])
-    # print(list(cities))
-    # print(cities.to_numpy().ravel())
     counts = pd.crosstab(cities.to_numpy().ravel(), clustered_data)
     print(counts)
+
+

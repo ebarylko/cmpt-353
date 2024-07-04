@@ -1,0 +1,43 @@
+1. The k-nearest neighbours model trained on LAB color values the highest validation scores compared to
+the other five models. In general, all models trained on LAB color values preformed better than their
+RGB color value counterparts; I believe this is due to LAB color space being more perceptually uniform,
+making distance measurements between two data points more meaningful. With regard to why the k-nearest
+neighbours model trained on LAB colors had the best performance of all the models, I was unable to
+determine why this was the case.
+
+Preguntar el profesor si tu analysis esta bien
+
+
+2. I think for some cities, the error is reasonable since the observations in both cities are similarly
+distributed among the clusters. I believe additional features which could aid in uniquely identifying
+cities are cloud cover, air quality, and UV index.
+
+Notes for question 1:
+Naive Gaussian Bayes and K-nearest Neighbours uses a measure of distance in order to
+calculate the probability. Since LAB color space is more perceptually uniform than
+RGB color space, the distance measures when using the two aforementioned models is
+more accurate and results in a higher validation score. For the random forest classifier,
+the decision trees use distance in order to decide a color. LAB color space makes
+comparisons with distance have more meaning, so it should yield a better result.
+
+The k-nearest neighbours model trained on LAB values had the highest validation scores compared to
+the other five models. I believe this occurred due to using a more perceptually uniform
+color space, making the distances between points have more meaning. Therefore, when searching for
+the color corresponding a specific data point, the k-nearest
+
+I am unsure as to why k-nearest neighbours preformed the best. All these models use distance
+to assign labels to the data points, and
+
+Gaussian Naive bayes calculates how far a point is from the centroid.
+K-nearest neighbours calculates the averages of all the k closest neighbours to you
+Random forest uses multiple decision trees and takes the averages of them.
+
+Notes for question 2:
+I think for some cities, the error is reasonable since the observations in both cities are similarily
+distributed among the clusters. For other cities, the error appears to be made since both cities have
+entries in the clusters which are not relatively close.
+
+For additional features which could help us determine the city, maybe air quality could be one of them?
+There may be cities which are plagued by wildfires in a certain time of the year, so knowing the time
+of the year and the air quality may help narrow down the city. Additionally recording the UV index and
+cloud cover metric may help distinguish cities.
