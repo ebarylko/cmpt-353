@@ -37,6 +37,11 @@ def read_unlabelled_data(filename: str) -> pd.DataFrame:
 
 
 def save_predictions_to_file(predictions, file_name: str):
+    """
+    @param predictions: the cities corresponding to the validation weather data
+    @param file_name: the file to save the predictions to
+    @return: saves the predictions to the file with name file_name
+    """
     pd.Series(predictions).to_csv(file_to_save_to, index=False, header=False)
 
 
@@ -55,17 +60,12 @@ if not getenv('TESTING'):
     print("The accuracy of the model on the validation data is",
           model.score(validation_weather_data, validation_cities))
 
-    predictions = model.predict(validation_weather_data)
-    comparisons = pd.DataFrame({'expected': validation_cities,
-                                'actual': predictions})
-    prediction_is_not_accurate = comparisons['expected'] != comparisons['actual']
-    print(comparisons[prediction_is_not_accurate])
-    # unlabelled_file_name = argv[2]
-    #
-    # unlabelled_data = read_unlabelled_data(unlabelled_file_name)
-    #
-    # city_predictions = model.predict(unlabelled_data)
-    #
-    # file_to_save_to = argv[3]
-    #
-    # save_predictions_to_file(city_predictions, file_to_save_to)
+    unlabelled_file_name = argv[2]
+
+    unlabelled_data = read_unlabelled_data(unlabelled_file_name)
+
+    city_predictions = model.predict(unlabelled_data)
+
+    file_to_save_to = argv[3]
+
+    save_predictions_to_file(city_predictions, file_to_save_to)
