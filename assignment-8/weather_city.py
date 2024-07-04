@@ -1,6 +1,7 @@
 from os import getenv
 from sys import argv
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
@@ -22,7 +23,7 @@ def split_data(data: pd.DataFrame, columns_to_split_on):
 
 model = make_pipeline(
     MinMaxScaler(),
-    RandomForestClassifier()
+    RandomForestClassifier(n_estimators=290, min_samples_leaf=9)
 )
 
 
@@ -33,4 +34,9 @@ if not getenv('TESTING'):
 
     cities, weather_data = split_data(labelled_data, ['city'])
 
-    model.fit(weather_data, cities)
+    (training_cities, validation_cities,
+     training_weather_data, validation_weather_data) = train_test_split(cities.to_numpy().ravel(), weather_data)
+
+    model.fit(training_weather_data, training_cities)
+
+    print(model.score(validation_weather_data, validation_cities))
