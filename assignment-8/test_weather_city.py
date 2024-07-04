@@ -11,7 +11,7 @@ expected_cities = pd.DataFrame({"city": ["A", "B"]})
 expected_year_and_snowfall = pd.DataFrame({"year": [1, 2],
                                            "snowfall": [4, 5]})
 
-actual_cities, actual_year_and_snowfall = wc.split_data(sample_data, ['city'])
+actual_cities, actual_year_and_snowfall = wc.split_data_on_column(sample_data, 'city')
 
 
 def test_split_data():
