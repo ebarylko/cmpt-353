@@ -6,7 +6,6 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 
 
 def split_data(data: pd.DataFrame, columns_to_split_on):
@@ -47,6 +46,17 @@ def get_clusters(weather_data: pd.DataFrame):
     return model.fit_predict(weather_data)
 
 
+def plot_data_in_clusters(data: pd.DataFrame, data_in_clusters):
+    """
+    @param data: the information to plot
+    @param data_in_clusters: the clusters to assign the points in data to
+    @return: plots the datapoints in data and colors them by the cluster categories in data_in_clusters
+    """
+    plt.figure(figsize=(10, 6))
+    plt.scatter(data[:, 0], data[:, 1], c=data_in_clusters, cmap='Set1', edgecolor='k', s=30)
+    plt.savefig('clusters.png')
+
+
 if not getenv('TESTING'):
     labelled_file_name = argv[1]
 
@@ -58,9 +68,7 @@ if not getenv('TESTING'):
 
     clustered_data = get_clusters(weather)
 
-    plt.figure(figsize=(10, 6))
-    plt.scatter(data_with_only_two_features[:, 0], data_with_only_two_features[:, 1], c=clustered_data, cmap='Set1', edgecolor='k', s=30)
-    plt.savefig('clusters.png')
+    plot_data_in_clusters(data_with_only_two_features, clustered_data)
 
     counts = pd.crosstab(cities.to_numpy().ravel(), clustered_data)
     print(counts)
