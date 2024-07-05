@@ -8,15 +8,15 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
 
-def split_data(data: pd.DataFrame, columns_to_split_on):
+def split_data_on_column(data: pd.DataFrame, column_to_split_on):
     """
     @param data: a DataFrame containing data about the weather in multiple cities over a period of 55 years
-    @param columns_to_split_on: a subset of the columns in data
-    @return: two dataframes, the first containing the data associated with the columns in columns_to_split_on, and
-    the second containing the data pertaining to all the columns not in columns_to_split_on
+    @param column_to_split_on: a subset of the columns in data
+    @return: two dataframes, the first containing the information associated with the columns in columns_to_split_on,
+     and the second containing the information pertaining to all the columns in data not in columns_to_split_on
     """
     cpy = data.copy()
-    is_part_of_columns_to_split_on = cpy.columns.isin(columns_to_split_on)
+    is_part_of_columns_to_split_on = cpy.columns.isin([column_to_split_on])
     data_associated_with_columns = cpy.loc[:, is_part_of_columns_to_split_on]
     data_not_associated_with_columns = cpy.loc[:, ~is_part_of_columns_to_split_on]
     return data_associated_with_columns, data_not_associated_with_columns
@@ -62,7 +62,7 @@ if not getenv('TESTING'):
 
     labelled_data = pd.read_csv(labelled_file_name)
 
-    cities, weather = split_data(labelled_data, ['city'])
+    cities, weather = split_data_on_column(labelled_data, 'city')
 
     data_with_only_two_features = reduce_features_down_to_two(weather)
 
