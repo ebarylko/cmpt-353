@@ -29,8 +29,8 @@ def reduce_features_down_to_two(weather_data: pd.DataFrame) -> pd.DataFrame:
     @return: a DataFrame containing the two most important features in weather_data
     """
     model = make_pipeline(
-        PCA(n_components=2),
-        MinMaxScaler()
+        MinMaxScaler(),
+        PCA(n_components=2)
     )
     return model.fit_transform(weather_data)
 
@@ -42,7 +42,10 @@ def get_data_clusters(weather_data: pd.DataFrame):
     @return: a collection where each entry is a prediction for the cluster the corresponding entry
     in weather_data belongs to
     """
-    model = KMeans(n_clusters=9)
+    model = make_pipeline(
+        MinMaxScaler(),
+        KMeans(n_clusters=9)
+    )
     return model.fit_predict(weather_data)
 
 
