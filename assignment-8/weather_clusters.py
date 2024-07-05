@@ -35,7 +35,7 @@ def reduce_features_down_to_two(weather_data: pd.DataFrame) -> pd.DataFrame:
     return model.fit_transform(weather_data)
 
 
-def get_clusters(weather_data: pd.DataFrame):
+def get_data_clusters(weather_data: pd.DataFrame):
     """
     @param weather_data: a DataFrame containing the weather across multiple cities over a
     period of 55 years
@@ -66,7 +66,7 @@ if not getenv('TESTING'):
 
     data_with_only_two_features = reduce_features_down_to_two(weather)
 
-    clustered_data = get_clusters(weather)
+    clustered_data = get_data_clusters(weather)
 
     plot_data_in_clusters(data_with_only_two_features, clustered_data)
 
