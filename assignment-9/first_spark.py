@@ -31,7 +31,6 @@ def gen_table(info: DataFrame) -> DataFrame:
 def main(in_directory, out_directory):
     # Read the data from the JSON files
     xyz = spark.read.json(in_directory, schema=schema)
-    xyz.show(); return
 
     # Create a DF with what we need: x, (soon y,) and id%10 which we'll aggregate by.
     with_bins = xyz.select(

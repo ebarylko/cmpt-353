@@ -1,19 +1,23 @@
 from pyspark.sql import SparkSession, DataFrame
-# from pyspark.testing.utils import assertDataFrameEqual
-# from first_spark import gen_table
+from first_spark import gen_table
+import chispa.dataframe_comparer as cd
+
 
 spark = SparkSession.builder.getOrCreate()
 
-sample_data = spark.createDataFrame([
-    (1, 1, 1, 1),
-    (2, 2, 2, 2),
-    (3, 3, 3, 3)
-],
-    schema=['id', 'x', 'y', 'z'])
+sample_data = spark.createDataFrame([(1, 1, 1, 1),
+                                     (1, 2, 3, 2),
+                                     (3, 3, 3, 3)],
+                                    schema=['id', 'x', 'y', 'z'])
 
-sample_data.show()
+expected_data = spark.createDataFrame([(1, 3, 2., 2),
+                                      (3, 3, 3., 1)],
+                                      schema=['bin', 'sum(x)', 'avg(y)', 'count(1)'])
+
+expected_data.show()
+gen_table(sample_data).show()
 
 
-# def test_gen_table():
-#     assertDataFrameEqual()
+def test_gen_table():
+    cd.assert_df_equality(gen_table(sample_data), expected_data, ignore_nullable=True)
 
