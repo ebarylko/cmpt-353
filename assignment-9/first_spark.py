@@ -29,29 +29,18 @@ def gen_table(info: DataFrame) -> DataFrame:
             .agg(functions.sum('x'), functions.avg('y'), functions.count('*')))
 
 def main(in_directory, out_directory):
-    # Read the data from the JSON files
-    xyz = spark.read.json(in_directory, schema=schema)
+    """
+    @param in_directory: the directory to read the data from
+    @param out_directory: the directory to write the results to
+    @return: writes to out_directory the result of aggregating and sorting the data in in_directory
+    """
+    data = spark.read.json(in_directory, schema=schema)
 
-    # Create a DF with what we need: x, (soon y,) and id%10 which we'll aggregate by.
-    with_bins = xyz.select(
-        xyz['x'],
-        xyz['y'],
-        (xyz['id'] % 10).alias('bin'),
-    )
+    aggregated_data = gen_table(data)
 
-    #
-    # # Aggregate by the bin number.
-    grouped = with_bins.groupBy(with_bins['bin'])
-    groups = grouped.agg(
-        functions.sum(with_bins['x']),
-        functions.avg(with_bins['y']),
-        functions.count('*'))
+    sorted_and_split_data = aggregated_data.sort(aggregated_data['bin']).coalesce(2)
+    sorted_and_split_data.write.csv(out_directory, compression=None, mode='overwrite')
 
-    # # We know groups has <=10 rows, so it can safely be moved into two partitions.
-    groups.show()
-    return
-    # groups = groups.sort(groups['bin']).coalesce(2)
-    # groups.write.csv(out_directory, compression=None, mode='overwrite')
 
 
 if not getenv('TESTING'):

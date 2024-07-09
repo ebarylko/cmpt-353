@@ -14,9 +14,6 @@ expected_data = spark.createDataFrame([(1, 3, 2., 2),
                                       (3, 3, 3., 1)],
                                       schema=['bin', 'sum(x)', 'avg(y)', 'count(1)'])
 
-expected_data.show()
-gen_table(sample_data).show()
-
 
 def test_gen_table():
     cd.assert_df_equality(gen_table(sample_data), expected_data, ignore_nullable=True)
