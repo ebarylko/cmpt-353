@@ -33,6 +33,8 @@ if not getenv('TESTING'):
     input_directory = argv[1]
     data = spark.read.csv(input_directory, schema=observation_schema)
 
-    # max_temperature_observations = filter_max_temp_observations(data)
+    max_temperature_observations = filter_valid_observations(data)
+
+    station_date_and_temp = get_station_date_and_temp(max_temperature_observations)
 
     # data.show()
