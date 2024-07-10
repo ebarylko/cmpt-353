@@ -1,5 +1,5 @@
 from sys import argv, version_info
-from pyspark.sql import SparkSession, functions, types, DataFrame
+from pyspark.sql import SparkSession, types, DataFrame
 from os import getenv
 
 spark = SparkSession.builder.getOrCreate()
@@ -19,8 +19,20 @@ observation_schema = types.StructType([
     types.StructField('obstime', types.StringType()),
 ])
 
+
+def filter_valid_observations(data: DataFrame) -> DataFrame:
+    """
+    @param data: a DataFrame containing weather observations where each row has a station name, a date, the type of observation,
+    the value associated with the observation, the mflag, the qflag, the sflag, and the obstime
+    @return: a DataFrame containing observations that were reported in Canada about the maximum temperature
+    """
+    return data.filter((data.observation == 'TMAX') & (data.qflag == 'NULL') & (data.station.startswith('CA')))
+
+
 if not getenv('TESTING'):
     input_directory = argv[1]
     data = spark.read.csv(input_directory, schema=observation_schema)
 
-    data.show()
+    # max_temperature_observations = filter_max_temp_observations(data)
+
+    # data.show()

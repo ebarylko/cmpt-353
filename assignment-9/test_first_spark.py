@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import SparkSession
 from first_spark import gen_table
 import chispa.dataframe_comparer as cd
 
