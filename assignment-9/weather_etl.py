@@ -35,6 +35,14 @@ if not getenv('TESTING'):
 
     max_temperature_observations = filter_valid_observations(data)
 
-    station_date_and_temp = get_station_date_and_temp(max_temperature_observations)
+    # station_date_and_temp = get_station_date_and_temp(max_temperature_observations)
 
     # data.show()
+
+
+def get_station_date_and_tmax(data: DataFrame) -> DataFrame:
+    """
+    @param data: a DataFrame containing weather observations about the maximum temperatures recorded within Canada
+    @return: a DataFrame containing only the date, station name, and temperature associated with the observation
+    """
+    return data.select(data['station'], data['date'], (data['value'] / 10).alias("tmax"))
