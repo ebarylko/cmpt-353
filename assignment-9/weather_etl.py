@@ -26,23 +26,29 @@ def filter_valid_observations(data: DataFrame) -> DataFrame:
     the value associated with the observation, the mflag, the qflag, the sflag, and the obstime
     @return: a DataFrame containing observations that were reported in Canada about the maximum temperature
     """
-    return data.filter((data.observation == 'TMAX') & (data.qflag == 'NULL') & (data.station.startswith('CA')))
+    return data.filter((data.observation == 'TMAX') & (data.qflag.isNull()) & (data.station.startswith('CA')))
+
+
+def get_station_date_and_tmax(data: DataFrame) -> DataFrame:
+    """
+    @param data: a DataFrame containing weather observations taken within Canada measuring the maximum temperatures
+    observed multiplied by 10
+    @return: a DataFrame containing only the date, station name, and actual maximum temperature associated with
+    the observation
+    """
+    return data.select(data['station'], data['date'], (data['value'] / 10).alias("tmax"))
 
 
 if not getenv('TESTING'):
     input_directory = argv[1]
     data = spark.read.csv(input_directory, schema=observation_schema)
 
-    max_temperature_observations = filter_valid_observations(data)
-
-    # station_date_and_temp = get_station_date_and_temp(max_temperature_observations)
-
     # data.show()
+    # new_data = data.filter((data.station.startswith('CA')) & (data.observation == 'TMAX') )
+    max_temperature_observations = filter_valid_observations(data)
+    max_temperature_observations.show()
 
+    # station_date_and_temp = get_station_date_and_tmax(max_temperature_observations)
 
-def get_station_date_and_tmax(data: DataFrame) -> DataFrame:
-    """
-    @param data: a DataFrame containing weather observations about the maximum temperatures recorded within Canada
-    @return: a DataFrame containing only the date, station name, and temperature associated with the observation
-    """
-    return data.select(data['station'], data['date'], (data['value'] / 10).alias("tmax"))
+    # station_date_and_temp.show()
+
