@@ -21,29 +21,37 @@ schema = types.StructType([
 def gen_table(info: DataFrame) -> DataFrame:
     """
     @param info: a DataFrame containing rows which have an x value, y value, and an id
-    @return: a DataFrame containing the rows grouped by the new id (id modulo 10) containing the sum of
-    the x values and average of the y values
+    @return: a DataFrame containing the rows grouped by the new id (id modulo 10) with the sum of
+    the x values and the average of the y values
     """
-    return (info.select(info['x'], info['y'], (info['id'] % 10).alias('bin')).
-            groupBy('bin')
-            .agg(functions.sum('x'), functions.avg('y'), functions.count('*')))
+    x_y_and_new_id = info.select(info['x'], info['y'], (info['id'] % 10).alias('bin'))
+    return x_y_and_new_id.groupBy('bin').agg(functions.sum('x'), functions.avg('y'), functions.count('*'))
 
-def main(in_directory, out_directory):
-    """
-    @param in_directory: the directory to read the data from
-    @param out_directory: the directory to write the results to
-    @return: writes to out_directory the result of aggregating and sorting the data in in_directory
-    """
-    data = spark.read.json(in_directory, schema=schema)
 
-    aggregated_data = gen_table(data)
-
-    sorted_and_split_data = aggregated_data.sort(aggregated_data['bin']).coalesce(2)
-    sorted_and_split_data.write.csv(out_directory, compression=None, mode='overwrite')
+#
+# def main(in_directory, out_directory):
+#     """
+#     @param in_directory: the directory to read the data from
+#     @param out_directory: the directory to write the results to
+#     @return: writes to out_directory the result of aggregating and sorting the data in in_directory
+#     """
+#     data = spark.read.json(in_directory, schema=schema)
+#
+#     aggregated_data = gen_table(data)
+#
+#     sorted_and_split_data = aggregated_data.sort(aggregated_data['bin']).coalesce(2)
+#     sorted_and_split_data.write.csv(out_directory, compression=None, mode='overwrite')
 
 
 
 if not getenv('TESTING'):
     in_directory = sys.argv[1]
+
+    data = spark.read.json(in_directory, schema=schema)
+
+    aggregated_data = gen_table(data)
+
+    sorted_and_split_data = aggregated_data.sort(aggregated_data['bin']).coalesce(2)
+
     out_directory = sys.argv[2]
-    main(in_directory, out_directory)
+    sorted_and_split_data.write.csv(out_directory, compression=None, mode='overwrite')
