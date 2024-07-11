@@ -5,8 +5,8 @@ from os import getenv
 spark = SparkSession.builder.getOrCreate()
 spark.sparkContext.setLogLevel('WARN')
 
-assert version_info >= (3, 8) # make sure we have Python 3.8+
-assert spark.version >= '3.2' # make sure we have Spark 3.2+
+assert version_info >= (3, 8)
+assert spark.version >= '3.2'
 
 observation_schema = types.StructType([
     types.StructField('station', types.StringType()),
@@ -43,12 +43,9 @@ if not getenv('TESTING'):
     input_directory = argv[1]
     data = spark.read.csv(input_directory, schema=observation_schema)
 
-    # data.show()
-    # new_data = data.filter((data.station.startswith('CA')) & (data.observation == 'TMAX') )
     max_temperature_observations = filter_valid_observations(data)
-    max_temperature_observations.show()
 
-    # station_date_and_temp = get_station_date_and_tmax(max_temperature_observations)
+    station_date_and_temp = get_station_date_and_tmax(max_temperature_observations)
 
-    # station_date_and_temp.show()
-
+    output_directory = argv[2]
+    station_date_and_temp.write.json(output_directory, compression="gzip", mode="overwrite")
