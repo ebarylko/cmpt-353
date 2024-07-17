@@ -26,7 +26,9 @@ def filter_valid_observations(data: DataFrame) -> DataFrame:
     the value associated with the observation, the mflag, the qflag, the sflag, and the obstime
     @return: a DataFrame containing observations that were reported in Canada about the maximum temperature
     """
-    return data.filter((data.observation == 'TMAX') & (data.qflag.isNull()) & (data.station.startswith('CA')))
+    return data.filter((data.observation == 'TMAX') &
+                       (data.qflag.isNull()) &
+                       (data.station.startswith('CA')))
 
 
 def get_station_date_and_tmax(data: DataFrame) -> DataFrame:
