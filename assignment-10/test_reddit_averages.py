@@ -16,11 +16,13 @@ sample_comments = spark.createDataFrame([("A", 1),
 
 end_data_schema = types.StructType([
     types.StructField("subreddit", types.StringType()),
-    types.StructField("avg(score)", types.LongType())
+    types.StructField("avg(score)", types.DoubleType())
 ])
 
-expected_comments = spark.createDataFrame([("A", 2),
-                                           ("B", 5)],
+expected_comments = spark.createDataFrame([("A", 2.),
+                                           ("B", 5.)],
                                           schema=end_data_schema)
 
-cd.assert_df_equality(expected_comments, ra.avg_score_for_each_subreddit(sample_comments))
+
+def test_avg_score_for_each_subreddit():
+    cd.assert_df_equality(expected_comments, ra.avg_score_for_each_subreddit(sample_comments))

@@ -40,10 +40,10 @@ def avg_score_for_each_subreddit(data: DataFrame) -> DataFrame:
     @return: A DataFrame which has the avg scores of the posts in each subreddit
     """
     return data.groupby('subreddit').avg('score')
-
-
-if not getenv('TESTING'):
-    reddit_comments_directory = argv[1]
-    data = spark.read.json(reddit_comments_directory, schema=comments_schema)
-
+#
+#
+# if not getenv('TESTING'):
+#     reddit_comments_directory = argv[1]
+#     data = spark.read.json(reddit_comments_directory, schema=comments_schema)
+#
     # avg_scores_for_each_subreddit = avg_score_for_each_subreddit(data)
