@@ -1,5 +1,5 @@
 from sys import argv, version_info
-from pyspark.sql import SparkSession, functions, types
+from pyspark.sql import SparkSession, types, DataFrame
 from os import getenv
 
 spark = SparkSession.builder.getOrCreate()
@@ -7,6 +7,7 @@ spark.sparkContext.setLogLevel('WARN')
 
 assert version_info >= (3, 8) # make sure we have Python 3.8+
 assert spark.version >= '3.2' # make sure we have Spark 3.2+
+
 
 comments_schema = types.StructType([
     types.StructField('archived', types.BooleanType()),
@@ -32,8 +33,17 @@ comments_schema = types.StructType([
     types.StructField('ups', types.LongType()),
 ])
 
+
+def avg_score_for_each_subreddit(data: DataFrame) -> DataFrame:
+    """
+    @param data: A DataFrame where each row contains the subreddit a post came from along with its score
+    @return: A DataFrame which has the avg scores of the posts in each subreddit
+    """
+    return data.groupby('subreddit').avg('score')
+
+
 if not getenv('TESTING'):
     reddit_comments_directory = argv[1]
     data = spark.read.json(reddit_comments_directory, schema=comments_schema)
 
-    avg_scores_for_each_subreddit = avg_score_for_each_subreddit(data)
+    # avg_scores_for_each_subreddit = avg_score_for_each_subreddit(data)
