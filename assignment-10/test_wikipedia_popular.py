@@ -33,3 +33,17 @@ expected_pages = spark.createDataFrame([("en", "a")],
 
 def test_filter_english_and_secondary_pages():
     cd.assert_df_equality(expected_pages, wp.filter_english_and_secondary_pages(sample_pages))
+
+unfiltered_pages = spark.createDataFrame([('20160801-12', 'a', 21),
+                                          ('20160801-12', 'b', 12),
+                                          ('20160801-12', 'c', 20),
+                                          ('20160801-13', 'b', 12)],
+                                         ['date', 'page_title', 'times_requested'])
+
+expected_filtered_pages = spark.createDataFrame([('20160801-12', 'a', 21),
+                                                 ('20160801-13', 'b', 12)],
+                                                ['date', 'page_title', 'times_requested'])
+
+
+def test_filter_pages_with_largest_hourly_views():
+    cd.assert_df_equality(expected_filtered_pages, wp.filter_pages_with_largest_hourly_views(unfiltered_pages))

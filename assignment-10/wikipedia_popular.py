@@ -1,5 +1,6 @@
 from sys import argv, version_info
 from pyspark.sql import SparkSession, types, functions, DataFrame
+from pyspark.sql.functions import max
 from os import getenv
 import re
 
@@ -50,13 +51,26 @@ def filter_english_and_secondary_pages(sample_pages: DataFrame) -> DataFrame:
     return sample_pages.filter(is_in_english & is_secondary_page)
 
 
+def filter_pages_with_largest_hourly_views(pages: DataFrame) -> DataFrame:
+    """
+    @param pages: a DataFrame containing the title of the wikipedia page, the date it was accessed, and the number
+    of times it was accessed, along with other information
+    @return: a DataFrame containing the most viewed wikipedia pages in every hour
+    """
+    max_page_views_by_hour = pages.groupby('date').agg(max('times_requested').alias('max_counts'))
+    return (pages.join(max_page_views_by_hour, 'date').
+            filter(pages.times_requested == max_page_views_by_hour.max_counts).
+            drop('max_counts'))
+
+
 
 if not getenv('TESTING'):
     wikipedia_pages_directory = argv[1]
 
     wikipedia_pages = read_wikipedia_pages(wikipedia_pages_directory)
 
+    english_and_secondary_pages = filter_english_and_secondary_pages(wikipedia_pages)
 
-    # names = wikipedia_pages.select('filename').limit(10).collect()
-    # print(names)
+    most_viewed_pages = filter_pages_with_largest_hourly_views(english_and_secondary_pages)
 
+    sorted_pages = most_viewed_pages.sort(['date', 'page_title']).select('date', 'page_title', 'times_requested').show()
