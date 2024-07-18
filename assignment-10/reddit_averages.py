@@ -43,15 +43,16 @@ def write_to_directory(subreddit_data: DataFrame, directory: str):
 
 
 if not getenv('TESTING'):
+    assert(len(argv) == 3, "Usage: spark-submit reddit_averages.py input_directory prefix_output_directories")
     reddit_comments_directory = argv[1]
     data = spark.read.json(reddit_comments_directory, schema=comments_schema)
 
-    avg_scores_for_each_subreddit = avg_score_for_each_subreddit(data)
+    avg_scores = avg_score_for_each_subreddit(data)
 
-    subreddits_sorted_by_name = avg_scores_for_each_subreddit.sort('subreddit')
+    subreddits_sorted_by_name = avg_scores.sort('subreddit')
 
-    subreddits_sorted_by_score = avg_scores_for_each_subreddit.sort('avg(score)', ascending=False)
+    subreddits_sorted_by_score = avg_scores.sort('avg(score)', ascending=False)
 
-    output_directory = argv[2]
-    write_to_directory(subreddits_sorted_by_name, output_directory + '-subreddit')
-    write_to_directory(subreddits_sorted_by_score, output_directory + '-score')
+    prefix = argv[2]
+    write_to_directory(subreddits_sorted_by_name, prefix + '-subreddit')
+    write_to_directory(subreddits_sorted_by_score, prefix + '-score')
