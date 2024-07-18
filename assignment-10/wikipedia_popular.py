@@ -53,14 +53,16 @@ def filter_english_and_secondary_pages(sample_pages: DataFrame) -> DataFrame:
 
 def filter_pages_with_largest_hourly_views(pages: DataFrame) -> DataFrame:
     """
-    @param pages: a DataFrame containing the title of the wikipedia page, the date it was accessed, and the number
-    of times it was accessed, along with other information
+    @param pages: a DataFrame containing the title of the wikipedia page, the date it was accessed, the number
+    of times it was accessed, and with other information
     @return: a DataFrame containing the most viewed wikipedia pages in every hour
     """
-    max_page_views_by_hour = pages.groupby('date').agg(max('times_requested').alias('max_counts'))
+    max_page_views_by_hour = pages.groupby('date').agg(max('times_requested').alias('max_requests'))
+
+    is_most_requested_page = pages.times_requested == max_page_views_by_hour.max_requests
     return (pages.join(max_page_views_by_hour, 'date').
-            filter(pages.times_requested == max_page_views_by_hour.max_counts).
-            drop('max_counts'))
+            filter(is_most_requested_page).
+            drop('max_requests'))
 
 
 def date_title_and_times_requested(pages: DataFrame) -> DataFrame:
