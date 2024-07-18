@@ -30,6 +30,6 @@ if not getenv('TESTING'):
     wikipedia_pages_directory = argv[1]
 
     wikipedia_pages = spark.read.csv(wikipedia_pages_directory, sep=' ', schema=wikipedia_page_schema).withColumn('filename', functions.input_file_name())
-    names = wikipedia_pages.select('filename').collect()
+    names = wikipedia_pages.select('filename').limit(10).collect()
     print(names)
 
