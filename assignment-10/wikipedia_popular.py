@@ -1,4 +1,4 @@
-from sys import argv, version_info
+from sys import argv
 from pyspark.sql import SparkSession, types, functions, DataFrame
 from pyspark.sql.functions import max
 from os import getenv
@@ -43,7 +43,7 @@ def filter_english_and_secondary_pages(sample_pages: DataFrame) -> DataFrame:
     @return: a DataFrame containing all the pages which are written in english and are not the main page nor a special
     page
     """
-    is_secondary_page = ~(sample_pages.page_title.startswith('Special:')) & (sample_pages.page_title != 'Main_Page')
+    is_secondary_page = ~(sample_pages.page_title.startswith('Special:') | (sample_pages.page_title == 'Main_Page'))
     is_in_english = sample_pages.language == 'en'
 
     return sample_pages.filter(is_in_english & is_secondary_page)
@@ -74,6 +74,7 @@ def date_title_and_times_requested(pages: DataFrame) -> DataFrame:
 
 
 if not getenv('TESTING'):
+    assert len(argv) == 3, "Usage: spark-submit wikipedia_popular.py input_directory output_directory"
     wikipedia_pages_directory = argv[1]
 
     wikipedia_pages = read_wikipedia_pages(wikipedia_pages_directory)

@@ -43,7 +43,7 @@ def write_to_directory(subreddit_data: DataFrame, directory: str):
 
 
 if not getenv('TESTING'):
-    assert(len(argv) == 3, "Usage: spark-submit reddit_averages.py input_directory prefix_output_directories")
+    assert len(argv) == 3, "Usage: spark-submit reddit_averages.py input_directory prefix_output_directories"
     reddit_comments_directory = argv[1]
     data = spark.read.json(reddit_comments_directory, schema=comments_schema)
 
