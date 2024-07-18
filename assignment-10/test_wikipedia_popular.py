@@ -1,6 +1,7 @@
 import wikipedia_popular as wp
 from pyspark.sql import SparkSession, types
 from chispa.column_comparer import assert_column_equality
+import chispa.dataframe_comparer as cd
 
 spark = SparkSession.builder.getOrCreate()
 
@@ -20,4 +21,20 @@ def test_filepath_to_date():
     assert_column_equality(filename_expected_dates_and_actual_dates, 'expected_date', 'actual_date')
 
 
-# def test_filter
+filter_schema = observation_schema = types.StructType([types.StructField('language', types.StringType()),
+                                                       types.StructField('title', types.StringType()),])
+
+
+sample_pages = spark.createDataFrame([("en", "Special: 1234"),
+                                      ("spa", "Second"),
+                                      ("en", "a"),
+                                      ("en", "Main_Page")],
+                                     schema=filter_schema)
+
+expected_pages = spark.createDataFrame([("en", "a")],
+                                       schema=filter_schema)
+
+print(wp.filter_english_and_secondary_pages(sample_pages))
+
+def test_filter_english_and_secondary_pages():
+    cd.assert_df_equality(expected_pages, wp.filter_english_and_secondary_pages(sample_pages))
