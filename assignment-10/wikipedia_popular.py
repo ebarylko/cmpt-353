@@ -63,6 +63,15 @@ def filter_pages_with_largest_hourly_views(pages: DataFrame) -> DataFrame:
             drop('max_counts'))
 
 
+def date_title_and_times_requested(pages: DataFrame) -> DataFrame:
+    """
+    @param pages: a DataFrame where each row contains the date a wikipedia page was accessed, the title
+    of the page, the number of times the page was accessed, and other information
+    @return: a DataFrame containing the date the page was accessed, the title of the page, and the number of
+    times the page was accessed, sorted by the date and the title ascending
+    """
+    return pages.sort(['date', 'page_title']).select('date', 'page_title', 'times_requested')
+
 
 if not getenv('TESTING'):
     wikipedia_pages_directory = argv[1]
@@ -73,4 +82,7 @@ if not getenv('TESTING'):
 
     most_viewed_pages = filter_pages_with_largest_hourly_views(english_and_secondary_pages)
 
-    sorted_pages = most_viewed_pages.sort(['date', 'page_title']).select('date', 'page_title', 'times_requested').show()
+    sorted_pages = date_title_and_times_requested(most_viewed_pages)
+
+    output_directory = argv[2]
+    sorted_pages.write.csv(output_directory, sep=',', mode='overwrite')
