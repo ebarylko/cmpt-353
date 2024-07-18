@@ -10,14 +10,13 @@ assert version_info >= (3, 8) # make sure we have Python 3.8+
 assert spark.version >= '3.2' # make sure we have Spark 3.2+
 
 
-
 @functions.udf(returnType=types.StringType())
 def filepath_to_date(filepath):
     """
-    @param filepath: a path to a csv file containing pagecounts-YYYYMMDD-HHMMSS* as part of the name
+    @param filepath: a path to a csv file having 'pagecounts-YYYYMMDD-HHMMSS*' as part of the name
     @return: the YYYYMMDD-HH portion of the filename
     """
-    date_of_file = re.search(r'pagecounts-(\d{8}-\d{2})\d*', filepath)
+    date_of_file = re.search(r'pagecounts-(\d{8}-\d{2})\d{4,}', filepath)
     return date_of_file.groups()[0]
 
 
@@ -25,7 +24,7 @@ def read_wikipedia_pages(pages_directory: str) -> DataFrame:
     """
     @param pages_directory: the name of a directory containing files where each contains rows having the language of the
     wikipedia page accessed, the name of the page, the number of times it was accessed, and how many bytes were transmitted
-    @return: a DataFrame containing the previously mentioned information along with the date the page was accessed
+    @return: a DataFrame containing the information above along with the date the page was accessed
     """
     wikipedia_page_schema = types.StructType([
         types.StructField('language', types.StringType()),
@@ -35,17 +34,18 @@ def read_wikipedia_pages(pages_directory: str) -> DataFrame:
     ])
 
     wikipedia_page_info = (spark.read.csv(pages_directory, sep=' ', schema=wikipedia_page_schema).
-                           withColumn('filepath', functions.input_file_name()))
-    page_info_with_date = wikipedia_page_info.withColumn('date', filepath_to_date('filepath'))
-    return page_info_with_date
+                           withColumn('date', filepath_to_date(functions.input_file_name())))
+    return wikipedia_page_info
 
 
 def filter_english_and_secondary_pages(sample_pages: DataFrame) -> DataFrame:
     """
-    @param sample_pages: a DataFrame containing the title and language of a wikipedia page, along with other information
-    @return: all the pages which are in english and are not the main page nor a special page
+    @param sample_pages: a DataFrame where each row has the title and language of a wikipedia page, along with other
+    information
+    @return: a DataFrame containing all the pages which are written in english and are not the main page nor a special
+    page
     """
-    is_secondary_page = ~((sample_pages.page_title.startswith('Special:')) | (sample_pages.page_title == 'Main_Page'))
+    is_secondary_page = ~(sample_pages.page_title.startswith('Special:')) & (sample_pages.page_title != 'Main_Page')
     is_in_english = sample_pages.language == 'en'
 
     return sample_pages.filter(is_in_english & is_secondary_page)

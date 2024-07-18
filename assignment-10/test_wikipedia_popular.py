@@ -24,6 +24,7 @@ def test_filepath_to_date():
 sample_pages = spark.createDataFrame([("en", "Special: 1234"),
                                       ("spa", "Second"),
                                       ("en", "a"),
+                                      ("spa", "Special: 2"),
                                       ("en", "Main_Page")],
                                      ['language', 'page_title'])
 
@@ -33,6 +34,7 @@ expected_pages = spark.createDataFrame([("en", "a")],
 
 def test_filter_english_and_secondary_pages():
     cd.assert_df_equality(expected_pages, wp.filter_english_and_secondary_pages(sample_pages))
+
 
 unfiltered_pages = spark.createDataFrame([('20160801-12', 'a', 21),
                                           ('20160801-12', 'b', 12),
