@@ -44,14 +44,11 @@ def filter_english_and_secondary_pages(sample_pages: DataFrame) -> DataFrame:
     @param sample_pages: a DataFrame containing the title and language of a wikipedia page, along with other information
     @return: all the pages which are in english and are not the main page nor a special page
     """
-    # is_secondary_page = sample_pages.page_title.startsWith('Special:') | sample_pages.page_title == 'Main_Page'
-    # is_in_english = sample_pages.page_title == 'en'
+    is_secondary_page = ~((sample_pages.page_title.startswith('Special:')) | (sample_pages.page_title == 'Main_Page'))
+    is_in_english = sample_pages.language == 'en'
 
-    # return sample_pages.title == "Main"
-    return sample_pages.filter((sample_pages.language == 'en') &
-                               (sample_pages.title.startswith('Special:')))
+    return sample_pages.filter(is_in_english & is_secondary_page)
 
-    # return sample_pages.filter(is_in_english & is_secondary_page)
 
 
 if not getenv('TESTING'):

@@ -21,20 +21,15 @@ def test_filepath_to_date():
     assert_column_equality(filename_expected_dates_and_actual_dates, 'expected_date', 'actual_date')
 
 
-filter_schema = observation_schema = types.StructType([types.StructField('language', types.StringType()),
-                                                       types.StructField('title', types.StringType()),])
-
-
 sample_pages = spark.createDataFrame([("en", "Special: 1234"),
                                       ("spa", "Second"),
                                       ("en", "a"),
                                       ("en", "Main_Page")],
-                                     schema=filter_schema)
+                                     ['language', 'page_title'])
 
 expected_pages = spark.createDataFrame([("en", "a")],
-                                       schema=filter_schema)
+                                       ['language', 'page_title'])
 
-print(wp.filter_english_and_secondary_pages(sample_pages))
 
 def test_filter_english_and_secondary_pages():
     cd.assert_df_equality(expected_pages, wp.filter_english_and_secondary_pages(sample_pages))
