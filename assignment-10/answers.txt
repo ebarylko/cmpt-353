@@ -1,0 +1,6 @@
+1. I would say that most of the time taken to process the reddit-2 data is in reading it, since we see a difference of
+33 seconds when not using a schema.
+reddit-0: 52.420s
+reddit-2b with schema:  1m43.912s
+reddit-2b without schema:  2m17.654s
+reddit-2b with schema and cache: 1m56.312s
