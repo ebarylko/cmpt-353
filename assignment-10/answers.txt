@@ -1,6 +1,15 @@
-1. I would say that most of the time taken to process the reddit-2 data is in reading it, since we see a difference of
-33 seconds when not using a schema.
+
+1. The times taken for the reddit_averages.py file to run using the following directories and restrictions are
+the following: it took 52.42 seconds when using the reddit-0 directory; it took 103.91 seconds when using the reddit-2b
+directory with a schema; it took 137.65 seconds when using the reddit-2b directory without a schema; it took
+116.31 seconds when using the reddit-2b directory with a schema and caching.
+
+2. I would say that most of the time taken to process the reddit-2 data is in reading it, since we see a difference of
+approximately 33 seconds when not using a schema.
+
 reddit-0: 52.420s
 reddit-2b with schema:  1m43.912s
 reddit-2b without schema:  2m17.654s
 reddit-2b with schema and cache: 1m56.312s
+
+3.

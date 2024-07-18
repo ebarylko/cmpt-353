@@ -5,10 +5,6 @@ from os import getenv
 spark = SparkSession.builder.getOrCreate()
 spark.sparkContext.setLogLevel('WARN')
 
-assert version_info >= (3, 8) # make sure we have Python 3.8+
-assert spark.version >= '3.2' # make sure we have Spark 3.2+
-
-
 comments_schema = types.StructType([
     types.StructField('archived', types.BooleanType()),
     types.StructField('author', types.StringType()),
@@ -42,6 +38,10 @@ def avg_score_for_each_subreddit(data: DataFrame) -> DataFrame:
     return data.groupby('subreddit').avg('score')
 
 
+def write_to_directory(subreddit_data: DataFrame, directory: str):
+    subreddit_data.wrote.csv(directory, mode='overwrite')
+
+
 if not getenv('TESTING'):
     reddit_comments_directory = argv[1]
     data = spark.read.json(reddit_comments_directory, schema=comments_schema)
@@ -53,5 +53,5 @@ if not getenv('TESTING'):
     subreddits_sorted_by_score = avg_scores_for_each_subreddit.sort('avg(score)', ascending=False)
 
     output_directory = argv[2]
-    subreddits_sorted_by_name.write.csv(output_directory + '-subreddit', mode='overwrite')
-    subreddits_sorted_by_score.write.csv(output_directory + '-score', mode='overwrite')
+    write_to_directory(subreddits_sorted_by_name, output_directory + '-subreddit')
+    write_to_directory(subreddits_sorted_by_score, output_directory + '-score')

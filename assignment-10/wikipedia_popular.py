@@ -6,8 +6,6 @@ import re
 
 spark = SparkSession.builder.getOrCreate()
 spark.sparkContext.setLogLevel('WARN')
-assert version_info >= (3, 8) # make sure we have Python 3.8+
-assert spark.version >= '3.2' # make sure we have Spark 3.2+
 
 
 @functions.udf(returnType=types.StringType())
