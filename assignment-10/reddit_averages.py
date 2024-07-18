@@ -39,7 +39,7 @@ def avg_score_for_each_subreddit(data: DataFrame) -> DataFrame:
 
 
 def write_to_directory(subreddit_data: DataFrame, directory: str):
-    subreddit_data.wrote.csv(directory, mode='overwrite')
+    subreddit_data.write.csv(directory, mode='overwrite')
 
 
 if not getenv('TESTING'):
