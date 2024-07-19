@@ -79,7 +79,7 @@ if not getenv('TESTING'):
 
     wikipedia_pages = read_wikipedia_pages(wikipedia_pages_directory)
 
-    english_and_secondary_pages = filter_english_and_secondary_pages(wikipedia_pages)
+    english_and_secondary_pages = filter_english_and_secondary_pages(wikipedia_pages).cache()
 
     most_viewed_pages = filter_pages_with_largest_hourly_views(english_and_secondary_pages)
 
