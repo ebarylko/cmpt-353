@@ -3,13 +3,21 @@ the following: it took 52.42 seconds when using the reddit-0 directory; it took 
 directory with a schema; it took 137.65 seconds when using the reddit-2b directory without a schema; it took
 116.31 seconds when using the reddit-2b directory with a schema and caching.
 
-2. I would say that most of the time taken to process the reddit-2 data is in reading it, since we see a difference of
-approximately 33 seconds when not using a schema.
+2. Most of the time taken to process the reddit-2 data is in reading it. since we see a difference of
+approximately 33 seconds when not using a schema. This means that it takes 33 seconds to read all the data into a
+Pyspark DataFrame. Considering that it takes approximately 52 seconds to read and process the data and 33 seconds
+of that time is devoted to reading the data, only 19 seconds is used towards calculating the averages.
+
 
 reddit-0: 52.420s
 reddit-2b with schema:  1m43.912s
 reddit-2b without schema:  2m17.654s
 reddit-2b with schema and cache: 1m56.312s
+
+reddit-0: 0m48.053s
+reddit-2b with schema and cache:1m54.688s
+reddit-2b with schema: 1m31.048s
+reddit-2b without schema: 2m5.484s
 
 3. Within the wikipedia_popular.py file, I placed the call to the cache method after filtering the
 wikipedia pages written in english and those whose title does not start with "Special:" or is "Main_Page".
