@@ -10,5 +10,4 @@ approximately 52 seconds. Considering that 33 of the 52 seconds is used to read 
 only 19 seconds is devoted to calculating the averages. Therefore, we can conclude that most of the time
 taken to process the reddit-2b data is associated with reading the data.
 
-3. Within the wikipedia_popular.py file, I placed the call to the cache method after filtering the
-wikipedia pages written in english and those whose title does not start with "Special:" or is "Main_Page".
+3. Within the wikipedia_popular.py file, I used the cache method after calling filter_english_and_secondary_pages.
