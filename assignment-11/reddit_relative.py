@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession, types
+from pyspark.sql import SparkSession, types, DataFrame, functions
 from os import getenv
 from sys import argv
 
@@ -29,9 +29,25 @@ comments_schema = types.StructType([
     types.StructField('ups', types.LongType()),
 ])
 
+
+def subreddits_with_positive_post_score_avg(posts: DataFrame) -> DataFrame:
+    """
+    @param posts: a DataFrame where each row contains information about a reddit post, including the
+    score, subreddit name, author, and other information
+    @return: a DataFrame where each row contains the name of a subreddit and the average score of its posts
+    if the average is positive.
+    """
+
+    subreddit_avgs = posts.groupby('subreddit').agg(functions.avg('score').alias('avg_score'))
+    has_positve_avg_score = subreddit_avgs.avg_score > 0
+
+    return subreddit_avgs.filter(has_positve_avg_score)
+
+
 if not getenv('TESTING'):
     posts_directory = argv[1]
 
     data = spark.read.json(posts_directory, schema=comments_schema)
 
     data.show()
+
