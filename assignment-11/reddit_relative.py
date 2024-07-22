@@ -59,6 +59,19 @@ def calc_relative_score(avgs: DataFrame, posts: DataFrame) -> DataFrame:
             .drop('avg_score'))
 
 
+def best_post_in_each_subreddit(posts: DataFrame) -> DataFrame:
+    """
+    @param posts: a DataFrame where each row contains information about a Reddit post, including the
+    subreddit it originated from, the score of the post, and its relative score
+    @return: a DataFrame containing the posts which have the highest relative score for their subreddit
+    """
+    largest_rel_scores = (posts.groupby('subreddit').
+                          agg(functions.max('relative_score').
+                              alias('relative_score')))
+    return largest_rel_scores.join(posts, on=['subreddit', 'relative_score'])
+
+
+
 if not getenv('TESTING'):
     posts_directory = argv[1]
 

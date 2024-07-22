@@ -34,3 +34,19 @@ expected_posts = spark.createDataFrame([("a", 1, 0.5),
 
 def test_calc_relative_score():
     assert_df_equality(expected_posts, rr.calc_relative_score(avg_scores, unfiltered_posts))
+
+
+sample_data = spark.createDataFrame([("a", 2, 3),
+                                     ("a", 1, 2),
+                                     ("b", 1, 2)],
+                                    ["subreddit", "score", "relative_score"])
+
+expected_data = spark.createDataFrame([("a", 2, 3),
+                                       ("b", 1, 2)],
+                                      ["subreddit", "score", "relative_score"])
+
+
+def test_best_post_in_each_subreddit():
+    assert_df_equality(expected_data,
+                       rr.best_post_in_each_subreddit(sample_data),
+                       ignore_column_order=True)
