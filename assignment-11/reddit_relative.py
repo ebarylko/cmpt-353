@@ -39,9 +39,9 @@ def subreddits_with_positive_post_score_avg(posts: DataFrame) -> DataFrame:
     """
 
     subreddit_avgs = posts.groupby('subreddit').agg(functions.avg('score').alias('avg_score'))
-    has_positve_avg_score = subreddit_avgs.avg_score > 0
+    has_positive_avg_score = subreddit_avgs.avg_score > 0
 
-    return subreddit_avgs.filter(has_positve_avg_score)
+    return subreddit_avgs.filter(has_positive_avg_score)
 
 
 def calc_relative_score(avgs: DataFrame, posts: DataFrame) -> DataFrame:
@@ -71,14 +71,25 @@ def best_post_in_each_subreddit(posts: DataFrame) -> DataFrame:
     return largest_rel_scores.join(posts, on=['subreddit', 'relative_score'])
 
 
+def store_best_posts(posts: DataFrame, output_dir: str):
+    author_subreddit_and_rel_score = (posts.select('subreddit', 'author', 'relative_score').
+                                      withColumnRenamed('relative_score', 'rel_score'))
+    author_subreddit_and_rel_score.write.json(output_dir, mode='overwrite')
+
 
 if not getenv('TESTING'):
+    assert len(argv) == 3, ("Intended usage of reddit_relative.py: spark-submit reddit_relative.py input_directory "
+                            "output_directory")
     posts_directory = argv[1]
 
-    data = spark.read.json(posts_directory, schema=comments_schema)
+    data = spark.read.json(posts_directory, schema=comments_schema).cache()
 
     pos_subreddit_avgs = subreddits_with_positive_post_score_avg(data)
-    pos_subreddit_avgs.show()
 
-    # posts_with_avg_and_relative_score = calc_relative_score(pos_subreddit_avgs, data)
+    posts_with_relative_score = calc_relative_score(pos_subreddit_avgs, data).cache()
+
+    best_posts = best_post_in_each_subreddit(posts_with_relative_score)
+
+    output_directory = argv[2]
+    store_best_posts(best_posts, output_directory)
 
