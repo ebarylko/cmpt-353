@@ -44,10 +44,28 @@ def subreddits_with_positive_post_score_avg(posts: DataFrame) -> DataFrame:
     return subreddit_avgs.filter(has_positve_avg_score)
 
 
+def calc_relative_score(avgs: DataFrame, posts: DataFrame) -> DataFrame:
+    """
+    @param avgs: a DataFrame where each row contains the name of a subreddit and the avg score of the posts in that
+    subreddit
+    @param posts: a DataFrame where each row contains the information about a post, including the subreddit
+    it originated from and its score
+    @return: a DataFrame containing only the posts pertaining to the subreddits in avgs, where each row
+    has the information about a post and its relative score
+    """
+    return (posts.join(avgs, on='subreddit').
+            withColumn('relative_score',
+                       functions.col('score') / functions.col('avg_score'))
+            .drop('avg_score'))
+
+
 if not getenv('TESTING'):
     posts_directory = argv[1]
 
     data = spark.read.json(posts_directory, schema=comments_schema)
 
-    data.show()
+    pos_subreddit_avgs = subreddits_with_positive_post_score_avg(data)
+    pos_subreddit_avgs.show()
+
+    # posts_with_avg_and_relative_score = calc_relative_score(pos_subreddit_avgs, data)
 
