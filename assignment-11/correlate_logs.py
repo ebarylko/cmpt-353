@@ -1,10 +1,8 @@
 from pyspark.sql import SparkSession, DataFrame, functions, Row
 from os import getenv
 from re import match
-from math import sqrt
 from sys import argv
 
-spark = SparkSession.builder.getOrCreate()
 
 LogInfo = Row("host", "bytes")
 
@@ -34,12 +32,18 @@ def calc_correlation_coefficient(logs: DataFrame):
     """
     total_requests_and_bytes = logs.groupBy('host').agg(functions.count('host').alias('total_requests'), functions.sum('bytes').alias('total_bytes')).drop('host')
     covariance = total_requests_and_bytes.cov('total_requests', 'total_bytes')
-    bytes_and_requests_std = total_requests_and_bytes.select(functions.std('total_requests') * functions.std('total_bytes')).collect()[0][0]
+    bytes_and_requests_std = total_requests_and_bytes.select(functions.std('total_requests') *
+                                                             functions.std('total_bytes')).collect()[0][0]
     return covariance / bytes_and_requests_std
 
 
 if not getenv('TESTING'):
-    rows = spark.sparkContext.textFile("nasa-logs-1")
+    spark = SparkSession.builder.getOrCreate()
+    assert len(argv) == 2, "Intended use of correlate_logs.py: spark-submit correlate_logs.py input_directory"
+
+    input_directory = argv[1]
+
+    rows = spark.sparkContext.textFile(input_directory)
 
     valid_logs = rows.map(extract_hostname_and_bytes).filter(is_valid_log).toDF(['host', 'bytes'])
 
