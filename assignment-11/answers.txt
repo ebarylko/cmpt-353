@@ -1,2 +1,2 @@
-no broadcasting: 3m15.617s
-Broadcasting:    5m54.899s
+no broadcasting:  1m51.014s
+Broadcasting:     1m33.447s
