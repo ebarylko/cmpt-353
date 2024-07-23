@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession, types, DataFrame, functions, Row
+from pyspark.sql import SparkSession, DataFrame, functions, Row
 from os import getenv
 from re import match
 from sys import argv
@@ -26,10 +26,19 @@ def is_valid_log(log: LogInfo) -> bool:
     return log is not None
 
 
+def calc_correlation_coefficient(logs: DataFrame):
+    """
+    @param logs: a DataFrame where each row contains a hostname and the number of bytes transferred
+    @return: the correlation coefficient for the number of times a request is made and the number of bytes transferred
+    """
+    log_statistics = logs.groupBy('host').agg(functions.count('host').alias('total_requests'), functions.sum('bytes').alias('total_bytes')).drop('host')
+    log_statistics.show()
+
+
 if not getenv('TESTING'):
     rows = spark.sparkContext.textFile("nasa-logs-1")
 
-    logs = rows.map(extract_hostname_and_bytes).filter(is_valid_log)
-    print(logs.take(10))
+    valid_logs = rows.map(extract_hostname_and_bytes).filter(is_valid_log).toDF(['host', 'bytes'])
 
+    calc_correlation_coefficient(valid_logs)
 
