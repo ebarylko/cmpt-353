@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession, DataFrame, functions, Row
 from os import getenv
 from re import match
+from math import sqrt
 from sys import argv
 
 spark = SparkSession.builder.getOrCreate()
@@ -31,8 +32,10 @@ def calc_correlation_coefficient(logs: DataFrame):
     @param logs: a DataFrame where each row contains a hostname and the number of bytes transferred
     @return: the correlation coefficient for the number of times a request is made and the number of bytes transferred
     """
-    log_statistics = logs.groupBy('host').agg(functions.count('host').alias('total_requests'), functions.sum('bytes').alias('total_bytes')).drop('host')
-    log_statistics.show()
+    total_requests_and_bytes = logs.groupBy('host').agg(functions.count('host').alias('total_requests'), functions.sum('bytes').alias('total_bytes')).drop('host')
+    covariance = total_requests_and_bytes.cov('total_requests', 'total_bytes')
+    bytes_and_requests_std = total_requests_and_bytes.select(functions.std('total_requests') * functions.std('total_bytes')).collect()[0][0]
+    return covariance / bytes_and_requests_std
 
 
 if not getenv('TESTING'):
@@ -40,5 +43,6 @@ if not getenv('TESTING'):
 
     valid_logs = rows.map(extract_hostname_and_bytes).filter(is_valid_log).toDF(['host', 'bytes'])
 
-    calc_correlation_coefficient(valid_logs)
+    corr_coef = calc_correlation_coefficient(valid_logs)
 
+    print(f"r = {corr_coef}\nr^2 = {corr_coef ** 2}")
