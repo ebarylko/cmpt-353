@@ -33,14 +33,13 @@ def subreddits_with_positive_post_score_avg(posts: DataFrame) -> DataFrame:
     """
     @param posts: a DataFrame where each row contains information about a reddit post, including the
     score, subreddit name, author, and other information
-    @return: a DataFrame where each row contains the name of a subreddit and the average score of its posts
-    if the average is positive.
+    @return: a DataFrame containing the subreddits having a positive average score of its posts. Has
+     one column for the subreddit name and another for the average score of the posts
     """
-
     subreddit_avgs = posts.groupby('subreddit').agg(functions.avg('score').alias('avg_score'))
-    has_positive_avg_score = subreddit_avgs.avg_score > 0
+    has_positive_score = subreddit_avgs.avg_score > 0
 
-    return subreddit_avgs.filter(has_positive_avg_score)
+    return subreddit_avgs.filter(has_positive_score)
 
 
 def calc_relative_score(avgs: DataFrame, posts: DataFrame) -> DataFrame:
