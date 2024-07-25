@@ -1,2 +1,10 @@
 no broadcasting:  1m51.014s
 Broadcasting:     1m33.447s
+
+1. The intermediate results I cached were the full set of posts I read at the beginning and the posts
+belonging to the subreddits with a positive average score. If I had not cached these DataFrames, I would
+be evaluating the same execution plan for a DataFrame multiple times.
+
+2. By hinting that a DataFrame could be broadcast, the reddit_relative.py file ran approximately 18 seconds
+faster compared to when no broadcasting occurred.
+
