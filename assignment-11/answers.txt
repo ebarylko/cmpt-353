@@ -5,6 +5,6 @@ Broadcasting:     1m33.447s
 belonging to the subreddits with a positive average score. If I had not cached these DataFrames, I would
 be evaluating the same execution plan for a DataFrame multiple times.
 
-2. By hinting that a DataFrame could be broadcast, the reddit_relative.py file ran approximately 18 seconds
-faster compared to when no broadcasting occurred.
+2. When using broadcasting, the reddit_relative.py file took 93.447 seconds. In comparison, the same file took
+111.014 seconds when not using broadcasting.
 
