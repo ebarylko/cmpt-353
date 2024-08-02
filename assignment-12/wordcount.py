@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import split, explode
+from pyspark.sql.functions import split, explode, col, lower
 from os import getenv
 import re
 import string
@@ -15,7 +15,8 @@ def extract_words_from_sentences(data: DataFrame) -> DataFrame:
     white_space_or_punctuation = r'[%s\s]+' % (re.escape(string.punctuation),)
     all_words = data.select(explode(split(data.sentences, white_space_or_punctuation)).alias('words'))
     is_not_empty = all_words.words != ''
-    return all_words.filter(is_not_empty)
+    return (all_words.select(lower(col('words')).alias('words'))
+            .filter(is_not_empty))
 
 
 if not getenv('TESTING'):
