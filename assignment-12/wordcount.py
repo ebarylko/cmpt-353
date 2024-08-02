@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import split, explode, col, lower
+from pyspark.sql.functions import split, explode, col, lower, desc, asc
 from os import getenv
 import re
 import string
@@ -17,6 +17,14 @@ def extract_words_from_sentences(data: DataFrame) -> DataFrame:
     is_not_empty = all_words.words != ''
     return (all_words.select(lower(col('words')).alias('words'))
             .filter(is_not_empty))
+
+
+def group_words_by_occurrence(data: DataFrame) -> DataFrame:
+    """
+    @param data: a DataFrame where each row contains a word
+    @return: a DataFrame containing a frequency table of all the words in data
+    """
+    return data.groupby('words').count().orderBy(desc('count'), asc('words'))
 
 
 if not getenv('TESTING'):

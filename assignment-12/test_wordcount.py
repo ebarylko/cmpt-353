@@ -30,19 +30,21 @@ def test_extract_words_from_sentences():
                        ignore_row_order=True)
 
 
-# data = spark.createDataFrame([("the",),
-#                               ("quick",),
-#                               ("the",),
-#                               ("hello",),
-#                               ("there",)],
-#                              schema='words string')
-#
-# expected_words = spark.createDataFrame([("the", 2),
-#                                         ("hello", 1),
-#                                         ("quick", 1),
-#                                         ("there", 1)],
-#                                        schema='word string count int')
-#
-#
-# def test_group_words_by_occurrence():
-#     assert_df_equality(expected_words, wc.group_words_by_occurrence(data))
+data = spark.createDataFrame([("the",),
+                              ("quick",),
+                              ("the",),
+                              ("hello",),
+                              ("there",)],
+                             schema='words string')
+
+expected_words = spark.createDataFrame([("the", 2),
+                                        ("hello", 1),
+                                        ("quick", 1),
+                                        ("there", 1)],
+                                       schema='word string, count long')
+
+wc.group_words_by_occurrence(data).show()
+def test_group_words_by_occurrence():
+    assert_df_equality(expected_words,
+                       wc.group_words_by_occurrence(data),
+                       ignore_nullable=True)
