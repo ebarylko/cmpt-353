@@ -13,9 +13,9 @@ def extract_words_from_sentences(data: DataFrame) -> DataFrame:
     where each row is a word previously extracted
     """
     white_space_or_punctuation = r'[%s\s]+' % (re.escape(string.punctuation),)
-    all_words = data.select(explode(split(data.sentences, white_space_or_punctuation)).alias('words'))
-    is_not_empty = all_words.words != ''
-    return (all_words.select(lower(col('words')).alias('words'))
+    all_words = data.select(explode(split(data.sentences, white_space_or_punctuation)).alias('word'))
+    is_not_empty = all_words.word != ''
+    return (all_words.select(lower(col('word')).alias('word'))
             .filter(is_not_empty))
 
 
@@ -25,10 +25,10 @@ def group_words_by_occurrence(data: DataFrame) -> DataFrame:
     @return: a DataFrame containing a frequency table of all the words in data ordered by the number of
     occurrences and the word
     """
-    return (data.groupby('words')
+    return (data.groupby('word')
             .count()
             .orderBy(desc('count'),
-                     asc('words')))
+                     asc('word')))
 
 
 if not getenv('TESTING'):

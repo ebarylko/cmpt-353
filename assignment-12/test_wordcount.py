@@ -21,7 +21,7 @@ expected_data = spark.createDataFrame([("the",),
                                        ("wall",),
                                        ("hello",),
                                        ("there",)],
-                                      schema='words string')
+                                      schema='word string')
 
 
 def test_extract_words_from_sentences():
@@ -35,13 +35,13 @@ data = spark.createDataFrame([("the",),
                               ("the",),
                               ("hello",),
                               ("there",)],
-                             schema='words string')
+                             schema='word string')
 
 expected_words = spark.createDataFrame([("the", 2),
                                         ("hello", 1),
                                         ("quick", 1),
                                         ("there", 1)],
-                                       schema='words string, count long')
+                                       schema='word string, count long')
 
 
 def test_group_words_by_occurrence():
