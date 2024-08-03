@@ -37,8 +37,9 @@ if not getenv('TESTING'):
 
     input_dir = argv[1]
 
-    # data = spark.read.text(input_dir)
-    # data2 = data.select(functions.split(data.value, white_space_or_punctuation).alias('words'))
-    # data3 = data2.select(functions.explode(data2.words))
-    # data3.show(100)
+    sentences = spark.read.text(input_dir).withColumnRenamed('value', 'sentences')
 
+    words_ordered_by_frequency = group_words_by_occurrence(extract_words_from_sentences(sentences))
+
+    output_dir = argv[2]
+    words_ordered_by_frequency.write.csv(output_dir, header=True, mode='overwrite')

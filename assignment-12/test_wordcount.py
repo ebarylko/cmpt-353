@@ -43,7 +43,7 @@ expected_words = spark.createDataFrame([("the", 2),
                                         ("there", 1)],
                                        schema='words string, count long')
 
-wc.group_words_by_occurrence(data).show()
+
 def test_group_words_by_occurrence():
     assert_df_equality(expected_words,
                        wc.group_words_by_occurrence(data),
