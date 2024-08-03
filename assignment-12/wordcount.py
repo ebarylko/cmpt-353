@@ -22,9 +22,13 @@ def extract_words_from_sentences(data: DataFrame) -> DataFrame:
 def group_words_by_occurrence(data: DataFrame) -> DataFrame:
     """
     @param data: a DataFrame where each row contains a word
-    @return: a DataFrame containing a frequency table of all the words in data
+    @return: a DataFrame containing a frequency table of all the words in data ordered by the number of
+    occurrences and the word
     """
-    return data.groupby('words').count().orderBy(desc('count'), asc('words'))
+    return (data.groupby('words')
+            .count()
+            .orderBy(desc('count'),
+                     asc('words')))
 
 
 if not getenv('TESTING'):

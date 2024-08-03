@@ -41,7 +41,7 @@ expected_words = spark.createDataFrame([("the", 2),
                                         ("hello", 1),
                                         ("quick", 1),
                                         ("there", 1)],
-                                       schema='word string, count long')
+                                       schema='words string, count long')
 
 wc.group_words_by_occurrence(data).show()
 def test_group_words_by_occurrence():
